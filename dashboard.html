@@ -60,6 +60,11 @@
         <h3>Регистрация ТС</h3>
         <p>Постановка автомобиля на учет</p>
     </div>
+    <div class="service-card" onclick="openService('Брак')">
+        <span>💍</span>
+        <h3>Регистрация брака</h3>
+        <p>Заключение союза между игроками</p>
+    </div>
 
     <div class="service-card" onclick="openService('Недвижимость')">
         <span>🏠</span>
@@ -111,6 +116,9 @@ window.location.href = "auto.html";
         else if (type === 'Правила') {
             window.location.href = "rules.html";
         }
+            else if (type === 'Брак') {
+        window.location.href = "marriage.html";
+    }
         else {
             alert("Этот раздел находится в разработке.");
         }
