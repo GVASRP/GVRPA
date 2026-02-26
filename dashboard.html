@@ -2,70 +2,96 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Вход | Greenville RP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>КальтУслуги | GVRPA</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: sans-serif; background: #121212; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: #1e1e1e; padding: 30px; border-radius: 10px; width: 300px; border: 1px solid #333; }
-        input { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; background: #222; border: 1px solid #444; color: white; border-radius: 5px; }
-        button { width: 100%; padding: 10px; background: #007bff; border: none; color: white; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .link { color: #007bff; cursor: pointer; font-size: 14px; text-align: center; display: block; margin-top: 10px; }
+        :root {
+            --bg: #0f111a;
+            --card: #1a1d2e;
+            --accent: #3b82f6;
+            --text: #e2e8f0;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .header { text-align: center; padding: 40px 0; }
+        .user-bar { display: flex; justify-content: space-between; max-width: 1000px; margin: 0 auto; background: var(--card); padding: 15px 25px; border-radius: 12px; margin-bottom: 30px; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 1000px; margin: 0 auto; }
+        
+        .service-card { background: var(--card); padding: 25px; border-radius: 15px; border: 1px solid #2d334d; transition: 0.3s; cursor: pointer; text-align: center; }
+        .service-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .service-card i { font-size: 40px; display: block; margin-bottom: 15px; }
+        
+        .btn-logout { background: #ef4444; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; }
+        h1 { margin: 0; font-size: 28px; }
+        p.desc { color: #94a3b8; margin-bottom: 40px; text-align: center; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2 id="title">Вход</h2>
-    <div id="reg-fields" style="display: none;">
-        <input type="text" id="tg_tag" placeholder="Твой тег в Telegram (@name)">
+<div class="user-bar">
+    <span id="user-name">Загрузка...</span>
+    <button class="btn-logout" onclick="logout()">Выйти</button>
+</div>
+
+<div class="header">
+    <h1>КалтУслуги</h1>
+    <p class="desc">Выберите необходимую услугу для подачи электронного заявления</p>
+</div>
+
+<div class="grid">
+    <div class="service-card" onclick="openService('Регистрация авто')">
+        <span>🚗</span>
+        <h3>Регистрация авто</h3>
+        <p style="font-size: 13px; color: #888;">Постановка ТС на учет</p>
     </div>
-    <input type="text" id="username" placeholder="Логин (Ник в игре)">
-    <input type="password" id="password" placeholder="Пароль">
-    <button onclick="handleAuth()" id="btn">Войти</button>
-    <span class="link" onclick="toggleMode()" id="toggleText">Нет аккаунта? Регистрация</span>
+
+    <div class="service-card" onclick="openService('Гражданство')">
+        <span>🛂</span>
+        <h3>Гражданство</h3>
+        <p style="font-size: 13px; color: #888;">Оформление ID-карты</p>
+    </div>
+
+    <div class="service-card" onclick="openService('Дом/Бизнес')">
+        <span>🏠</span>
+        <h3>Недвижимость</h3>
+        <p style="font-size: 13px; color: #888;">Регистрация недвижимости</p>
+    </div>
+
+    <div class="service-card" onclick="openService('Водительские права')">
+        <span>🪪</span>
+        <h3>Водительские права</h3>
+        <p style="font-size: 13px; color: #888;">Получение, замена или получение новых категорий</p>
+    </div>
 </div>
 
 <script>
+    // ТВОИ КЛЮЧИ ТУТ
     const SUPABASE_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_hqkja0dR9Kr4amSmucpHrA_VqeIaMRv';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let isLogin = true;
-
-    function toggleMode() {
-        isLogin = !isLogin;
-        document.getElementById('title').innerText = isLogin ? 'Вход' : 'Регистрация';
-        document.getElementById('btn').innerText = isLogin ? 'Войти' : 'Создать аккаунт';
-        document.getElementById('reg-fields').style.display = isLogin ? 'none' : 'block';
-        document.getElementById('toggleText').innerText = isLogin ? 'Нет аккаунта? Регистрация' : 'Есть аккаунт? Войти';
-    }
-
-    async function handleAuth() {
-        const user = document.getElementById('username').value;
-        const pass = document.getElementById('password').value;
-        const tg = document.getElementById('tg_tag').value;
-        
-        // Хитрость: превращаем логин в формат email для базы
-        const fakeEmail = user + "@rp.local";
-
-        if (isLogin) {
-            const { error } = await supabaseClient.auth.signInWithPassword({ email: fakeEmail, password: pass });
-            if (error) alert("Ошибка: " + error.message);
-            else window.location.href = "dashboard.html";
+    async function checkUser() {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) {
+            window.location.href = "index.html";
         } else {
-            // 1. Регистрация аккаунта
-            const { data, error } = await supabaseClient.auth.signUp({ email: fakeEmail, password: pass });
-            if (error) return alert(error.message);
-
-            // 2. Сохраняем ник и ТГ в таблицу профилей
-            const { error: profileError } = await supabaseClient
-                .from('profiles')
-                .insert([{ id: data.user.id, username: user, tg_tag: tg }]);
-            
-            if (profileError) alert("Ошибка профиля: " + profileError.message);
-            else alert("Успех! Теперь войдите.");
+            document.getElementById('user-name').innerText = "👤 Аккаунт: " + user.email.split('@')[0];
         }
     }
+
+    // Эта функция будет перенаправлять на формы (которые мы создадим чуть позже)
+    function openService(type) {
+        alert("Вы выбрали: " + type + ". Сейчас мы создадим форму для этого!");
+        // В будущем тут будет: window.location.href = "form.html?type=" + type;
+    }
+
+    async function logout() {
+        await supabaseClient.auth.signOut();
+        window.location.href = "index.html";
+    }
+
+    checkUser();
 </script>
 </body>
 </html>
