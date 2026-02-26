@@ -23,7 +23,7 @@
     <input type="text" id="defendant" placeholder="Ответчик">
     <textarea id="reason" rows="5" placeholder="Опишите ситуацию..."></textarea>
     
-    <button class="btn" onclick="submitCourt()">Отправить в суд</button>
+    <button class="btn" id="mainButton">Отправить в суд</button>
     <a href="dashboard.html" class="back">← Вернуться в меню</a>
 </div>
 
@@ -32,40 +32,50 @@
     const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk'; 
     const supabaseClient = supabase.createClient(S_URL, S_KEY);
 
-    async function submitCourt() {
+    // Используем самый надежный способ привязки кнопки
+    document.getElementById('mainButton').onclick = async function() {
         const p = document.getElementById('plaintiff').value;
         const d = document.getElementById('defendant').value;
         const r = document.getElementById('reason').value;
 
-        // ИСПРАВЛЕНО: Теперь тут стоят правильные знаки || (ИЛИ)
-        if (!p  !d  !r) {
+        // Простая проверка без сложных знаков
+        if (p == ""  d == ""  r == "") {
             alert("Заполните все поля!");
             return;
         }
 
         try {
-            const { data: { user } } = await supabaseClient.auth.getUser();
+            const authRes = await supabaseClient.auth.getUser();
+            const user = authRes.data.user;
+
             if (!user) {
-                alert("Ошибка авторизации!");
+                alert("Вы не авторизованы!");
                 return;
             }
 
-            // ИСПРАВЛЕНО: Текст обернут в обратные кавычки   (клавиша Ё)
-            const { error } = await supabaseClient.from('requests').insert([{
-                user_id: user.id,
-                type: 'Суд',
-                content: Истец: ${p} | Ответчик: ${d} | Суть: ${r},
-                status: 'pending'
-            }]);
+            // Склеиваем текст через плюсики, это 100% не выдаст ошибку
+            const textContent = "Истец: " + p + " | Ответчик: " + d + " | Суть: " + r;
 
-            if (error) throw error;
+            const dbRes = await supabaseClient.from('requests').insert([
+                {
+                    user_id: user.id,
+                    type: "Суд",
+                    content: textContent,
+                    status: "pending"
+                }
+            ]);
 
-            alert("Иск подан!");
-            window.location.href = "dashboard.html";
-        } catch (err) {
-            alert("Ошибка: " + err.message);
+            if (dbRes.error) {
+                alert("Ошибка базы: " + dbRes.error.message);
+            } else {
+                alert("Иск успешно подан!");
+                window.location.href = "dashboard.html";
+            }
+
+        } catch (e) {
+            alert("Ошибка: " + e.message);
         }
-    }
+    };
 </script>
 
 </body>
