@@ -2,90 +2,72 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мои заявки | GVRPA</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --bg: #0f111a; --card: #1a1d2e; --accent: #3b82f6; --text: #e2e8f0; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+        body { font-family: sans-serif; background: #0f111a; color: #e2e8f0; padding: 20px; }
         .container { max-width: 800px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .back-btn { color: #94a3b8; text-decoration: none; font-size: 14px; border: 1px solid #2d334d; padding: 8px 15px; border-radius: 8px; }
-        .request-card { background: var(--card); border: 1px solid #2d334d; border-radius: 12px; padding: 20px; margin-bottom: 15px; position: relative; }
-        .status-badge { position: absolute; top: 20px; right: 20px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
-        .status-pending { background: #f59e0b33; color: #f59e0b; border: 1px solid #f59e0b; }
-        .status-approved { background: #10b98133; color: #10b981; border: 1px solid #10b981; }
-        .status-rejected { background: #ef444433; color: #ef4444; border: 1px solid #ef4444; }
-        .type-tag { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 12px; background: var(--accent); color: white; margin-bottom: 10px; }
+        .header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .back-btn { color: #94a3b8; text-decoration: none; border: 1px solid #2d334d; padding: 5px 10px; border-radius: 5px; }
+        .request-card { background: #1a1d2e; border: 1px solid #2d334d; border-radius: 12px; padding: 20px; margin-bottom: 15px; position: relative; }
+        .status-badge { position: absolute; top: 20px; right: 20px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid; }
+        .status-pending { color: #f59e0b; }
+        .status-approved { color: #10b981; }
+        .status-rejected { color: #ef4444; }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <div class="header">
-        <a href="dashboard.html" class="back-btn">← Назад в меню</a>
-        <h2>Мои заявления</h2>
+    <div class="container">
+        <div class="header">
+            <a href="dashboard.html" class="back-btn">← Назад</a>
+            <h2>Мои заявления</h2>
+        </div>
+        <div id="requests-list">Загрузка...</div>
     </div>
-    <div id="requests-list">
-        <p style="text-align: center; color: #94a3b8;">Загрузка данных...</p>
-    </div>
-</div>
 
 <script>
-    // ПРОВЕРЬ ЭТИ ДАННЫЕ
     const S_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
-    const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk'; 
+    const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
 
     const supabaseClient = supabase.createClient(S_URL, S_KEY);
 
-    async function loadRequests() {
-        const listDiv = document.getElementById('requests-list');
+    async function load() {
+        const list = document.getElementById('requests-list');
         try {
             const { data: { user } } = await supabaseClient.auth.getUser();
-            if (!user) {
-                listDiv.innerHTML = 'Нужна авторизация!';
-                return;
-            }
+            if (!user) { list.innerHTML = "Ошибка: Вы не вошли!"; return; }
 
-            const { data: requests, error } = await supabaseClient
+            const { data: reqs, error } = await supabaseClient
                 .from('requests')
                 .select('*')
                 .eq('user_id', user.id)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
+            list.innerHTML = "";
 
-            listDiv.innerHTML = '';
-
-            if (!requests || requests.length === 0) {
-                listDiv.innerHTML = '<p style="text-align: center;">У вас пока нет заявлений.</p>';
+            if (!reqs || reqs.length === 0) {
+                list.innerHTML = "У вас пока нет заявлений.";
                 return;
             }
 
-            requests.forEach(req => {
+            reqs.forEach(r => {
                 const card = document.createElement('div');
                 card.className = 'request-card';
-
-                let sClass = 'status-pending';
-                let sText = 'В ожидании';
-                if (req.status === 'approved') { sClass = 'status-approved'; sText = 'Одобрено'; }
-                if (req.status === 'rejected') { sClass = 'status-rejected'; sText = 'Отклонено'; }
-
-                const date = new Date(req.created_at).toLocaleString('ru-RU');
-
+                let sTxt = r.status === 'approved' ? 'Одобрено' : (r.status === 'rejected' ? 'Отказ' : 'Ожидание');
+                let sCls = r.status === 'approved' ? 'status-approved' : (r.status === 'rejected' ? 'status-rejected' : 'status-pending');
+                
                 card.innerHTML = 
-                    <span class="type-tag">${req.type}</span>
-                    <span class="status-badge ${sClass}">${sText}</span>
-                    <div style="margin-top:10px;">${req.content}</div>
-                    <div style="font-size: 11px; color: #64748b; margin-top: 15px;">${date}</div>
+                    <div style="font-weight:bold; color:#3b82f6; margin-bottom:10px;">${r.type}</div>
+                    <span class="status-badge ${sCls}">${sTxt}</span>
+                    <div>${r.content}</div>
+                    <div style="font-size:11px; color:#64748b; margin-top:10px;">${new Date(r.created_at).toLocaleString()}</div>
                 ;
-                listDiv.appendChild(card);
+                list.appendChild(card);
             });
-        } catch (err) {
-            listDiv.innerHTML = 'Ошибка: ' + err.message;
-        }
+        } catch (e) { list.innerHTML = "Ошибка: " + e.message; }
     }
-    loadRequests();
+    load();
 </script>
 </body>
 </html>
