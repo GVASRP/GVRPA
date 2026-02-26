@@ -3,20 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>КальтУслуги | GVRPA</title>
+    <title>КальтУслуги | Wisconsin GVRPA</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --bg: #0f111a; --card: #1a1d2e; --accent: #3b82f6; --text: #e2e8f0; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        
+        /* Шапка */
         .user-bar { display: flex; justify-content: space-between; align-items: center; max-width: 1000px; margin: 0 auto 30px; background: var(--card); padding: 15px 25px; border-radius: 12px; border: 1px solid #2d334d; }
         #user-name { font-weight: bold; color: var(--accent); }
         .header { text-align: center; margin-bottom: 40px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; max-width: 1000px; margin: 0 auto; }
-        .service-card { background: var(--card); padding: 25px; border-radius: 15px; border: 1px solid #2d334d; transition: 0.3s; cursor: pointer; text-align: center; }
-        .service-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
-        .service-card span { font-size: 40px; display: block; margin-bottom: 10px; }
+        
+        /* Кнопки в шапке */
         .btn-logout { background: #ef4444; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; }
         .btn-profile { margin-left: 15px; background: none; border: 1px solid var(--accent); color: var(--accent); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+
+        /* СЕТКА ПЛИТОЧЕК - ИСПРАВЛЕНА */
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+            gap: 20px; 
+            max-width: 1000px; 
+            margin: 0 auto; 
+        }
+        
+        .service-card { 
+            background: var(--card); 
+            padding: 25px; 
+            border-radius: 15px; 
+            border: 1px solid #2d334d; 
+            transition: 0.3s; 
+            cursor: pointer; 
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .service-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+        .service-card span { font-size: 40px; display: block; margin-bottom: 10px; }
+        .service-card h3 { margin: 10px 0 5px; font-size: 18px; }
+        .service-card p { margin: 0; font-size: 13px; color: #94a3b8; }
+        
+        /* Особая плитка полиции */
+        #police-card { border-color: #1d4ed8; background: rgba(29, 78, 216, 0.05); }
     </style>
 </head>
 <body>
@@ -31,31 +62,54 @@
 
 <div class="header">
     <h1>КалтУслуги</h1>
-    <p style="color: #94a3b8;">Официальный портал GVRPA</p>
+    <p style="color: #94a3b8;">Официальный портал штата Висконсин (GVRPA)</p>
 </div>
 
 <div class="grid">
     <div class="service-card" onclick="openService('Гражданство')"><span>🛂</span><h3>Гражданство</h3><p>ID-карта</p></div>
     <div class="service-card" onclick="openService('Регистрация авто')"><span>🚗</span><h3>Авто</h3><p>Учет ТС</p></div>
-    <div class="service-card" onclick="openService('Полиция')" style="border-color: #1d4ed8;">
     <div class="service-card" onclick="openService('Недвижимость')"><span>🏠</span><h3>Дом</h3><p>Регистрация</p></div>
     <div class="service-card" onclick="openService('Водительские права')"><span>🪪</span><h3>Права</h3><p>Категории A,B,C</p></div>
     <div class="service-card" onclick="openService('Брак')"><span>💍</span><h3>Брак</h3><p>Регистрация союза</p></div>
     <div class="service-card" onclick="openService('Суд')"><span>⚖️</span><h3>Суд</h3><p>Иски и жалобы</p></div>
     <div class="service-card" onclick="openService('ДТП')"><span>💥</span><h3>ДТП</h3><p>Отчет об аварии</p></div>
     <div class="service-card" onclick="openService('Правила')"><span>📜</span><h3>Правила</h3><p>Устав и ПДД</p></div>
-    <div class="service-card" onclick="openService('Полиция')"><span>👮‍♂️</span><h3>База данных Граждан</h3><p>Только для сотрудников WPD</p></div>
+    
+    <div id="police-card" class="service-card" onclick="openService('Полиция')" style="display: none;">
+        <span>👮‍♂️</span>
+        <h3>База МВД</h3>
+        <p>Служебный доступ</p>
+    </div>
 </div>
 
 <script>
-    const SUPABASE_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk'; 
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const S_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
+    const S_KEY = 'ВСТАВЬ_СВОЙ_ДЛИННЫЙ_КЛЮЧ'; 
+    const supabaseClient = supabase.createClient(S_URL, S_KEY);
 
     async function checkUser() {
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        if (!user) { window.location.href = "index.html"; }
-        else { document.getElementById('user-name').innerText = "👤 " + user.email.split('@')[0]; }
+        try {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) { 
+                window.location.href = "index.html"; 
+                return;
+            }
+            
+            document.getElementById('user-name').innerText = "👤 " + user.email.split('@')[0];
+
+            // Проверка роли для кнопки полиции
+            const { data: profile } = await supabaseClient
+                .from('profiles')
+                .select('role')
+                .eq('id', user.id)
+                .single();
+
+            if (profile && (profile.role === 'police' || profile.role === 'admin')) {
+                document.getElementById('police-card').style.display = 'flex';
+            }
+        } catch (err) {
+            console.log("Ошибка профиля или роли:", err);
+        }
     }
 
     function openService(type) {
@@ -64,17 +118,17 @@
             'Гражданство': 'passport.html',
             'Недвижимость': 'house.html',
             'Водительские права': 'license.html',
-
-'Брак': 'marriage.html',
+            'Брак': 'marriage.html',
             'Суд': 'court.html',
             'ДТП': 'accident.html',
-            'Правила': 'rules.html'
+            'Правила': 'rules.html',
+            'Полиция': 'police_db.html'
         };
         if (routes[type]) { window.location.href = routes[type]; }
-        else { alert("В разработке"); }
     }
     
     async function logout() { await supabaseClient.auth.signOut(); window.location.href = "index.html"; }
+    
     checkUser();
 </script>
 </body>
