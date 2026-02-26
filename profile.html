@@ -5,37 +5,39 @@
     <title>Мои заявки | GVRPA</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: sans-serif; background: #0f111a; color: #e2e8f0; padding: 20px; }
+        :root { --bg: #0f111a; --card: #1a1d2e; --accent: #3b82f6; --text: #e2e8f0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
         .container { max-width: 800px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; margin-bottom: 20px; }
-        .back-btn { color: #94a3b8; text-decoration: none; border: 1px solid #2d334d; padding: 5px 10px; border-radius: 5px; }
-        .request-card { background: #1a1d2e; border: 1px solid #2d334d; border-radius: 12px; padding: 20px; margin-bottom: 15px; position: relative; }
-        .status-badge { position: absolute; top: 20px; right: 20px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid; }
-        .status-pending { color: #f59e0b; }
-        .status-approved { color: #10b981; }
-        .status-rejected { color: #ef4444; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .back-btn { color: #94a3b8; text-decoration: none; border: 1px solid #2d334d; padding: 8px 15px; border-radius: 8px; font-size: 14px; }
+        .request-card { background: var(--card); border: 1px solid #2d334d; border-radius: 12px; padding: 20px; margin-bottom: 15px; position: relative; }
+        .status-badge { position: absolute; top: 20px; right: 20px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .status-pending { background: #f59e0b33; color: #f59e0b; border: 1px solid #f59e0b; }
+        .status-approved { background: #10b98133; color: #10b981; border: 1px solid #10b981; }
+        .status-rejected { background: #ef444433; color: #ef4444; border: 1px solid #ef4444; }
+        .admin-note { margin-top: 15px; padding: 10px; background: rgba(59, 130, 246, 0.1); border-left: 3px solid var(--accent); font-size: 13px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <a href="dashboard.html" class="back-btn">← Назад</a>
-            <h2>Мои заявления</h2>
-        </div>
-        <div id="requests-list">Загрузка...</div>
+
+<div class="container">
+    <div class="header">
+        <a href="dashboard.html" class="back-btn">← Меню</a>
+        <h2>Мои заявления</h2>
     </div>
+    <div id="requests-list">Загрузка...</div>
+</div>
 
 <script>
     const S_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
-    const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
-
+    const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk'; 
     const supabaseClient = supabase.createClient(S_URL, S_KEY);
 
     async function load() {
         const list = document.getElementById('requests-list');
         try {
             const { data: { user } } = await supabaseClient.auth.getUser();
-            if (!user) { list.innerHTML = "Ошибка: Вы не вошли!"; return; }
+            if (!user) { list.innerHTML = "Ошибка авторизации!"; return; }
 
             const { data: reqs, error } = await supabaseClient
                 .from('requests')
@@ -44,28 +46,37 @@
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
-            list.innerHTML = "";
-
-            if (!reqs || reqs.length === 0) {
-                list.innerHTML = "У вас пока нет заявлений.";
-                return;
-            }
+            list.innerHTML = reqs.length === 0 ? "Заявок пока нет." : "";
 
             reqs.forEach(r => {
                 const card = document.createElement('div');
                 card.className = 'request-card';
-                let sTxt = r.status === 'approved' ? 'Одобрено' : (r.status === 'rejected' ? 'Отказ' : 'Ожидание');
-                let sCls = r.status === 'approved' ? 'status-approved' : (r.status === 'rejected' ? 'status-rejected' : 'status-pending');
                 
+                // Обработка JSON или Текста в content
+                let displayContent = "";
+                if (typeof r.content === 'object' && r.content !== null) {
+                    displayContent = r.content.info || JSON.stringify(r.content);
+                } else {
+                    displayContent = r.content;
+                }
+
+                let sCls = 'status-pending'; let sTxt = 'Ожидание';
+                if (r.status === 'approved') { sCls = 'status-approved'; sTxt = 'Одобрено'; }
+                if (r.status === 'rejected') { sCls = 'status-rejected'; sTxt = 'Отказ'; }
+
                 card.innerHTML = 
-                    <div style="font-weight:bold; color:#3b82f6; margin-bottom:10px;">${r.type}</div>
+                    <div style="font-weight:bold; color:#3b82f6; margin-bottom:5px;">${r.type}</div>
                     <span class="status-badge ${sCls}">${sTxt}</span>
-                    <div>${r.content}</div>
+                    <div style="font-size:14px;">${displayContent}</div>
+                    ${r.admin_answer ? <div class="admin-note"><b>Ответ админа:</b> ${r.admin_answer}</div> : ''}
                     <div style="font-size:11px; color:#64748b; margin-top:10px;">${new Date(r.created_at).toLocaleString()}</div>
                 ;
                 list.appendChild(card);
             });
-        } catch (e) { list.innerHTML = "Ошибка: " + e.message; }
+        } catch (e) {
+            list.innerHTML = "Ошибка: " + e.message;
+            console.error(e);
+        }
     }
     load();
 </script>
