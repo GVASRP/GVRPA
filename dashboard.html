@@ -84,13 +84,15 @@
     function openService(type) {
         if (type === 'Регистрация авто') {
             window.location.href = "auto.html";
-        } else if (type === 'Гражданство') {
-            window.location.href = "passport.html"; // Это сделаем следующим шагом
-        } else {
-            alert("Этот раздел (" + type + ") еще в разработке!");
+        } 
+        else if (type === 'Гражданство') {
+            window.location.href = "passport.html";
+        } 
+        else {
+            alert("Этот раздел еще в разработке!");
         }
     }
-
+    
     async function logout() {
         await supabaseClient.auth.signOut();
         window.location.href = "index.html";
