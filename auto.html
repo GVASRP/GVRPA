@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация ТС | GVRPA</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --bg: #0f111a; --card: #1a1d2e; --accent: #3b82f6; --text: #e2e8f0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
+        .form-container { background: var(--card); padding: 30px; border-radius: 15px; width: 100%; max-width: 500px; border: 1px solid #2d334d; }
+        h2 { text-align: center; color: var(--accent); }
+        label { display: block; margin: 15px 0 5px; font-size: 14px; color: #94a3b8; }
+        input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #2d334d; background: #0f111a; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; margin-top: 25px; background: var(--accent); border: none; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .back-btn { display: inline-block; margin-bottom: 20px; color: #94a3b8; text-decoration: none; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <a href="dashboard.html" class="back-btn">← Назад в меню</a>
+    <h2>Регистрация транспортного средства</h2>
+    
+    <label>Марка и модель автомобиля</label>
+    <input type="text" id="car_model" placeholder="Например: BMW M5 F90">
+    
+    <label>Номер автомобиля ( В форме AAA-111) </label>
+    <input type="text" id="car_plate" placeholder="Например: A777AA">
+    
+    <label>Цвет ТС</label>
+    <input type="text" id="car_color" placeholder="Черный металлик">
+
+    <button onclick="submitRequest()">Отправить заявление</button>
+    <p id="msg" style="text-align: center; margin-top: 15px;"></p>
+</div>
+
+<script>
+    // ТВОИ КЛЮЧИ
+    const SUPABASE_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_hqkja0dR9Kr4amSmucpHrA_VqeIaMRv';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function submitRequest() {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        const model = document.getElementById('car_model').value;
+        const plate = document.getElementById('car_plate').value;
+        const color = document.getElementById('car_color').value;
+
+        if(!model || !plate) return alert("Заполните основные поля!");
+
+        const { error } = await supabaseClient
+            .from('requests')
+            .insert([{ 
+                user_id: user.id, 
+                type: 'Авто', 
+                content: Модель: ${model} | Номер: ${plate} | Цвет: ${color},
+                status: 'pending' 
+            }]);
+
+        if (error) {
+            alert("Ошибка: " + error.message);
+        } else {
+            document.getElementById('msg').innerHTML = "✅ Заявка отправлена!";
+            setTimeout(() => { window.location.href = "dashboard.html"; }, 2000);
+        }
+    }
+</script>
+</body>
+</html>
