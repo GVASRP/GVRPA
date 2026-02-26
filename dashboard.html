@@ -3,77 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>КальтУслуги | Wisconsin GVRPA</title>
+    <title>Wisconsin Portal | GVRPA</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --bg: #0f111a; --card: #1a1d2e; --accent: #3b82f6; --text: #e2e8f0; }
+        * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
         
-        .user-bar { display: flex; justify-content: space-between; align-items: center; max-width: 1000px; margin: 0 auto 30px; background: var(--card); padding: 15px 25px; border-radius: 12px; border: 1px solid #2d334d; }
+        .user-bar { display: flex; justify-content: space-between; align-items: center; max-width: 1100px; margin: 0 auto 30px; background: var(--card); padding: 15px 25px; border-radius: 12px; border: 1px solid #2d334d; }
         #user-name { font-weight: bold; color: var(--accent); }
-        .header { text-align: center; margin-bottom: 40px; }
-        
-        .btn-logout { background: #ef4444; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; }
-        .btn-profile { margin-left: 15px; background: none; border: 1px solid var(--accent); color: var(--accent); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; text-decoration: none; }
+        .btn-logout { background: #ef4444; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-profile { color: var(--accent); text-decoration: none; border: 1px solid var(--accent); padding: 6px 12px; border-radius: 6px; font-size: 13px; margin-left: 10px; transition: 0.3s; }
+        .btn-profile:hover { background: var(--accent); color: white; }
 
-        .grid { 
+        .header { text-align: center; margin-bottom: 40px; }
+        h1 { margin-bottom: 5px; letter-spacing: 1px; }
+
+        /* ИСПРАВЛЕННАЯ СЕТКА */
+        .grid-container { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
             gap: 20px; 
-            max-width: 1000px; 
+            max-width: 1100px; 
             margin: 0 auto; 
         }
         
         .service-card { 
             background: var(--card); 
-            padding: 25px; 
-            border-radius: 15px; 
+            padding: 30px 20px; 
+            border-radius: 16px; 
             border: 1px solid #2d334d; 
-            transition: 0.3s; 
+            transition: all 0.3s ease; 
             cursor: pointer; 
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
+            min-height: 180px;
         }
         
-        .service-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
-        .service-card span { font-size: 40px; display: block; margin-bottom: 10px; }
-        .service-card h3 { margin: 10px 0 5px; font-size: 18px; color: #fff; }
+        .service-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 8px 25px rgba(0,0,0,0.5); }
+        .service-card span { font-size: 45px; margin-bottom: 15px; }
+        .service-card h3 { margin: 0 0 8px 0; font-size: 18px; color: #fff; }
         .service-card p { margin: 0; font-size: 13px; color: #94a3b8; }
         
-        #police-card { border-color: #1d4ed8; background: rgba(29, 78, 216, 0.05); display: none; }
+        /* Специальный стиль для полиции */
+        #police-card { 
+            display: none; /* Скрыто по умолчанию */
+            border-color: #1d4ed8; 
+            background: linear-gradient(145deg, #1a1d2e, #161b22);
+            box-shadow: inset 0 0 10px rgba(29, 78, 216, 0.2);
+        }
     </style>
 </head>
 <body>
 
 <div class="user-bar">
     <div>
-        <span id="user-name">👤 Загрузка...</span>
+        <span id="user-name">Загрузка...</span>
         <a href="profile.html" class="btn-profile">Мои заявки</a>
     </div>
     <button class="btn-logout" onclick="logout()">Выйти</button>
 </div>
 
 <div class="header">
-    <h1>КалтУслуги</h1>
-    <p style="color: #94a3b8;">Официальный портал штата Висконсин (GVRPA)</p>
+    <h1>Госуслуги Висконсина</h1>
+    <p style="color: #94a3b8; margin:0;">Government of Wisconsin | Online Portal</p>
 </div>
 
-<div class="grid">
-    <div class="service-card" onclick="openService('Гражданство')"><span>🛂</span><h3>Гражданство</h3><p>ID-карта</p></div>
-    <div class="service-card" onclick="openService('Регистрация авто')"><span>🚗</span><h3>Авто</h3><p>Учет ТС</p></div>
-    <div class="service-card" onclick="openService('Недвижимость')"><span>🏠</span><h3>Дом</h3><p>Регистрация</p></div>
-    <div class="service-card" onclick="openService('Водительские права')"><span>🪪</span><h3>Права</h3><p>Категории A,B,C</p></div>
-    <div class="service-card" onclick="openService('Брак')"><span>💍</span><h3>Брак</h3><p>Регистрация союза</p></div>
-    <div class="service-card" onclick="openService('Суд')"><span>⚖️</span><h3>Суд</h3><p>Иски и жалобы</p></div>
-    <div class="service-card" onclick="openService('ДТП')"><span>💥</span><h3>ДТП</h3><p>Отчет об аварии</p></div>
-    <div class="service-card" onclick="openService('Правила')"><span>📜</span><h3>Правила</h3><p>Устав и ПДД</p></div>
+<div class="grid-container">
+    <div class="service-card" onclick="openS('passport.html')"><span>🛂</span><h3>Гражданство</h3><p>Регистрация ID-карты</p></div>
+    <div class="service-card" onclick="openS('auto.html')"><span>🚗</span><h3>Автотранспорт</h3><p>Регистрация ТС и номеров</p></div>
+    <div class="service-card" onclick="openS('house.html')"><span>🏠</span><h3>Недвижимость</h3><p>Регистрация имущества</p></div>
+    <div class="service-card" onclick="openS('license.html')"><span>🪪</span><h3>Лицензии</h3><p>Водительское удостоверение</p></div>
+    <div class="service-card" onclick="openS('marriage.html')"><span>💍</span><h3>ЗАГС</h3><p>Регистрация брака</p></div>
+    <div class="service-card" onclick="openS('court.html')"><span>⚖️</span><h3>Судебная власть</h3><p>Подача исков и жалоб</p></div>
+    <div class="service-card" onclick="openS('accident.html')"><span>💥</span><h3>ДТП</h3><p>Оформить протокол аварии</p></div>
+    <div class="service-card" onclick="openS('rules.html')"><span>📜</span><h3>Законодательство</h3><p>ПДД и Конституция</p></div>
     
-    <div id="police-card" class="service-card" onclick="openService('Полиция')">
+    <div id="police-card" class="service-card" onclick="openS('police_db.html')">
         <span>👮‍♂️</span>
-        <h3>База МВД</h3>
-        <p>Служебный доступ</p>
+        <h3>База данных МВД</h3>
+        <p>Служебный доступ WPD</p>
     </div>
 </div>
 
@@ -82,56 +94,42 @@
     const S_KEY = 'ВСТАВЬ_СВОЙ_ДЛИННЫЙ_КЛЮЧ'; 
     const supabaseClient = supabase.createClient(S_URL, S_KEY);
 
-async function checkUser() {
-        try {
-            const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-            
-            // Если не авторизован вообще - на главную
-            if (!user || userError) { 
-                window.location.href = "index.html"; 
-                return;
-            }
-            
-            document.getElementById('user-name').innerText = "👤 " + user.email.split('@')[0];
+    async function init() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        // Если сессии нет - отправляем на вход
+        if (!session) {
+            window.location.href = "index.html";
+            return;
+        }
 
-            // Пробуем узнать роль
+        const user = session.user;
+        document.getElementById('user-name').innerText = "👤 " + user.email.split('@')[0];
+
+        // Проверка роли БЕЗ выкидывания при ошибке
+        try {
             const { data: profile } = await supabaseClient
                 .from('profiles')
                 .select('role')
                 .eq('id', user.id)
                 .single();
 
-            // Если нашли роль полиция/админ - показываем плитку
             if (profile && (profile.role === 'police' || profile.role === 'admin')) {
-                const pc = document.getElementById('police-card');
-                if (pc) pc.style.display = 'flex';
+                document.getElementById('police-card').style.display = 'flex';
             }
-        } catch (err) {
-            console.log("Доступ ограничен ролью, но сессия активна.");
+        } catch (e) {
+            console.log("Дополнительные права не обнаружены.");
         }
     }
 
-    function openService(type) {
-        const routes = {
-            'Регистрация авто': 'auto.html',
-            'Гражданство': 'passport.html',
-            'Недвижимость': 'house.html',
-            'Водительские права': 'license.html',
-            'Брак': 'marriage.html',
-            'Суд': 'court.html',
-            'ДТП': 'accident.html',
-            'Правила': 'rules.html',
-            'Полиция': 'police_db.html'
-        };
-        if (routes[type]) { window.location.href = routes[type]; }
-    }
+    function openS(url) { window.location.href = url; }
     
     async function logout() { 
         await supabaseClient.auth.signOut(); 
         window.location.href = "index.html"; 
     }
     
-    checkUser();
+    init();
 </script>
 </body>
 </html>
