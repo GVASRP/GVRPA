@@ -1,0 +1,91 @@
+На Рыбалке, [26.02.2026 18:46]
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Правила проекта | GVRPA</title>
+    <style>
+        :root { --bg: #0f111a; --card: #1a1d2e; --accent: #3b82f6; --text: #e2e8f0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; line-height: 1.6; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .back-btn { display: inline-block; margin-bottom: 20px; color: #94a3b8; text-decoration: none; font-size: 14px; }
+        
+        h1 { text-align: center; color: var(--accent); }
+        
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+        .tab-btn { background: var(--card); border: 1px solid #2d334d; color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        .tab-btn.active { background: var(--accent); border-color: var(--accent); }
+
+        .rules-section { display: none; background: var(--card); padding: 30px; border-radius: 15px; border: 1px solid #2d334d; }
+        .rules-section.active { display: block; }
+
+        h2 { border-bottom: 1px solid #2d334d; padding-bottom: 10px; color: var(--accent); }
+        .rule-item { margin-bottom: 15px; padding-left: 10px; border-left: 3px solid var(--accent); }
+        .warning-box { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; padding: 15px; border-radius: 8px; margin: 20px 0; color: #fecaca; }
+        b { color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="dashboard.html" class="back-btn">← Вернуться в кабинет</a>
+    <h1>Свод Правил GVRPA</h1>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('group')">Группа</button>
+        <button class="tab-btn" onclick="showTab('rp')">Отыгровка РП</button>
+        <button class="tab-btn" onclick="showTab('auto')">Машины</button>
+        <button class="tab-btn" onclick="showTab('pdd')">ПДД</button>
+    </div>
+
+    <div id="group" class="rules-section active">
+        <h2>№1. Правила группы проекта</h2>
+        <div class="rule-item"><b>1.0 - 1.2:</b> Запрещены пинг администрации, оскорбления личности/родных и срачи. (Мут от 2 часов + варн).</div>
+        <div class="rule-item"><b>1.3 - 1.4:</b> Реклама и обсуждение политики запрещены. (Мут от 3-6 часов + варн).</div>
+        <div class="rule-item"><b>1.6:</b> Неактив более 14 дней без причины — варн.</div>
+        <div class="rule-item"><b>1.8 - 1.9:</b> Токсичность к админам, расизм, оскорбление религий — <b>Бан навсегда</b>.</div>
+        <div class="rule-item"><b>1.15:</b> Обязательная регистрация авто в течение 10 минут после покупки.</div>
+        <div class="warning-box">За использование дюпов — БАН на 2 дня и полное обнуление персонажей!</div>
+    </div>
+
+    <div id="rp" class="rules-section">
+        <h2>№2. Отыгровка РП</h2>
+        <div class="rule-item"><b>2.1:</b> Реализм во всём. Никаких 300-летних магов. Скин должен быть человеческим.</div>
+        <div class="rule-item"><b>2.2:</b> Телефонные разговоры: <code>-т- Сообщение</code></div>
+        <div class="rule-item"><b>2.3:</b> Реплика персонажа: <code>- Привет!</code></div>
+        <div class="rule-item"><b>2.4:</b> Вне РП чат (OOC): <code>// Текст</code></div>
+        <div class="rule-item"><b>2.5:</b> Действия: <code>*достал паспорт*</code></div>
+        <div class="rule-item"><b>2.9:</b> Вы обязаны оплачивать покупки (еду, бензин, дома) владельцам заведений.</div>
+    </div>
+
+    <div id="auto" class="rules-section">
+        <h2>№3. Ограничения на транспорт</h2>
+        <div class="rule-item"><b>3.1:</b> Запрещены выдуманные авто (сани, тыквы, Ghostbusters). Только реальные марки.</div>
+        <div class="rule-item"><b>Лимит:</b> Разрешены автомобили стоимостью до 200,000 ( регистрировать авто стоимостью 100,000+ можно только с разрешением администрации).</div>
+    </div>
+
+На Рыбалке, [26.02.2026 18:46]
+<div id="pdd" class="rules-section">
+        <h2>№4. Правила Дорожного Движения</h2>
+        <div class="rule-item"><b>Скорость:</b> 55 миль/ч вне населенных пунктов.</div>
+        <div class="rule-item"><b>ДТП:</b> Остановка, вызов полиции. (Штраф: 15 мин тюрьмы за побег).</div>
+        <div class="rule-item"><b>Запрещено:</b> DM (убийство), ЕПП (езда по полям), погони в мирное время.</div>
+        <div class="rule-item"><b>Приоритет:</b> Всегда пропускать спецтранспорт (сирена/маячки).</div>
+        <div class="rule-item"><b>Остановка:</b> По требованию полиции обязаны прижаться к обочине.</div>
+    </div>
+
+</div>
+
+<script>
+    function showTab(tabId) {
+        document.querySelectorAll('.rules-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+</script>
+
+</body>
+</html>
