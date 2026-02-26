@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои заявки | GVRPA</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --bg: #0f111a; --card: #1a1d2e; --accent: #3b82f6; --text: #e2e8f0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .back-btn { color: #94a3b8; text-decoration: none; font-size: 14px; }
+        
+        .request-card { 
+            background: var(--card); border: 1px solid #2d334d; border-radius: 12px; 
+            padding: 20px; margin-bottom: 15px; position: relative;
+        }
+        .type-tag { 
+            display: inline-block; padding: 4px 10px; border-radius: 6px; 
+            font-size: 12px; font-weight: bold; text-transform: uppercase; margin-bottom: 10px;
+        }
+        .status-badge { 
+            position: absolute; top: 20px; right: 20px; 
+            padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;
+        }
+        
+        /* Цвета статусов */
+        .status-pending { background: #f59e0b33; color: #f59e0b; border: 1px solid #f59e0b; }
+        .status-approved { background: #10b98133; color: #10b981; border: 1px solid #10b981; }
+        .status-rejected { background: #ef444433; color: #ef4444; border: 1px solid #ef4444; }
+        
+        /* Цвета типов */
+        .type-car { background: #3b82f6; color: white; }
+        .type-passport { background: #10b981; color: white; }
+        .type-house { background: #f59e0b; color: white; }
+        .type-default { background: #64748b; color: white; }
+
+        .content { font-size: 14px; color: #cbd5e1; line-height: 1.5; }
+        .date { font-size: 12px; color: #64748b; margin-top: 15px; }
+        .no-data { text-align: center; color: #64748b; margin-top: 50px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <a href="dashboard.html" class="back-btn">← Вернуться в меню</a>
+        <h2>Мои заявления</h2>
+    </div>
+
+    <div id="requests-list">
+        <p style="text-align: center;">Загрузка истории...</p>
+    </div>
+</div>
+
+<script>
+    const S_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
+    const S_KEY = 'ВСТАВЬ_СВОЙ_ДЛИННЫЙ_КЛЮЧ_ЗДЕСЬ';
+    const supabaseClient = supabase.createClient(S_URL, S_KEY);
+
+    async function loadRequests() {
+        try {
+            // 1. Получаем текущего пользователя
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) {
+                window.location.href = "index.html";
+                return;
+            }
+
+            // 2. Достаем его заявки из таблицы
+            const { data: requests, error } = await supabaseClient
+                .from('requests')
+                .select('*')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            const listDiv = document.getElementById('requests-list');
+            listDiv.innerHTML = '';
+
+            if (requests.length === 0) {
+                listDiv.innerHTML = '<div class="no-data">У вас пока нет поданных заявлений.</div>';
+                return;
+            }
+
+            // 3. Выводим каждую заявку
+            requests.forEach(req => {
+                const card = document.createElement('div');
+                card.className = 'request-card';
+
+                // Определяем класс для статуса
+                let statusClass = 'status-pending';
+                let statusText = 'В ожидании';
+                if (req.status === 'approved') { statusClass = 'status-approved'; statusText = 'Одобрено'; }
+                if (req.status === 'rejected') { statusClass = 'status-rejected'; statusText = 'Отклонено'; }
+
+// Определяем цвет тега типа
+                let typeClass = 'type-default';
+                if (req.type === 'Авто') typeClass = 'type-car';
+                if (req.type === 'Гражданство') typeClass = 'type-passport';
+                if (req.type === 'Недвижимость') typeClass = 'type-house';
+
+                const date = new Date(req.created_at).toLocaleString('ru-RU');
+
+                card.innerHTML = 
+                    <span class="type-tag ${typeClass}">${req.type}</span>
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                    <div class="content">${req.content}</div>
+                    <div class="date">Подано: ${date}</div>
+                ;
+                listDiv.appendChild(card);
+            });
+
+        } catch (err) {
+            console.error(err);
+            document.getElementById('requests-list').innerHTML = '<p style="color:red">Ошибка при загрузке данных.</p>';
+        }
+    }
+
+    loadRequests();
+</script>
+
+</body>
+</html>
