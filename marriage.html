@@ -2,91 +2,41 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Регистрация брака | GVRPA</title>
+    <title>Брак | Wisconsin</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --bg: #0f111a; --card: #1a1d2e; --accent: #ec4899; --text: #e2e8f0; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
-        .form-container { background: var(--card); padding: 30px; border-radius: 15px; width: 100%; max-width: 500px; border: 1px solid #2d334d; text-align: center; }
-        h2 { color: var(--accent); margin-bottom: 10px; }
-        p.desc { font-size: 14px; color: #94a3b8; margin-bottom: 25px; }
-        label { display: block; margin: 15px 0 5px; font-size: 14px; color: #94a3b8; text-align: left; }
-        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #2d334d; background: #0f111a; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 15px; margin-top: 25px; background: var(--accent); border: none; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { opacity: 0.9; transform: scale(1.02); }
-        button:disabled { background: #444; cursor: not-allowed; }
-        .back-btn { display: inline-block; margin-bottom: 20px; color: #94a3b8; text-decoration: none; font-size: 14px; }
-        .hearts { font-size: 30px; margin-bottom: 10px; }
+        :root { --bg: #0f111a; --card: #1a1d2e; --accent: #db2777; --text: #e2e8f0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+        .form-container { max-width: 500px; margin: 0 auto; background: var(--card); padding: 30px; border-radius: 15px; border: 1px solid #2d334d; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #2d334d; background: #0d1117; color: white; box-sizing: border-box; }
+        .btn-send { width: 100%; padding: 15px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 15px; }
     </style>
 </head>
 <body>
-
-<div class="form-container">
-    <a href="dashboard.html" class="back-btn">← Назад в меню</a>
-    <div class="hearts">💍💕</div>
-    <h2>Регистрация Брака</h2>
-    <p class="desc">Оставьте заявку на официальное заключение союза</p>
-    
-    <label>Ник первого супруга (@ в телеграмм)</label>
-    <input type="text" id="partner1" placeholder="Введите ник">
-    
-    <label>Ник второго супруга (@ в телеграмм)</label>
-    <input type="text" id="partner2" placeholder="Введите ник">
-    
-    <label>Желаемая дата церемонии (или текущая)</label>
-    <input type="text" id="m_date" placeholder="Например: 26.02.2026">
-
-    <button id="mainBtn" onclick="submitMarriage()">Заключить союз</button>
-    <p id="msg" style="text-align: center; margin-top: 15px;"></p>
-</div>
+    <div class="form-container">
+        <h2 style="text-align: center;">💍 Регистрация брака</h2>
+        <input type="text" id="p1" placeholder="@ в телеграме первого супруга">
+        <input type="text" id="p2" placeholder="@ в телеграме второго супруга">
+        <button class="btn-send" id="submitBtn">Заключить брак</button>
+        <a href="dashboard.html" style="display:block; text-align:center; margin-top:20px; color:#94a3b8; text-decoration:none;">← Назад</a>
+    </div>
 
 <script>
-    const S_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co'; 
-    const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk'; 
-    
+    const S_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
+    const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
     const supabaseClient = supabase.createClient(S_URL, S_KEY);
 
-    async function submitMarriage() {
-        const btn = document.getElementById('mainBtn');
-        btn.disabled = true;
-        btn.innerText = "Скрепляем узы...";
+    document.getElementById('submitBtn').addEventListener('click', async () => {
+        const p1 = document.getElementById('p1').value;
+        const p2 = document.getElementById('p2').value;
+        if(!p1 || !p2) return alert("Заполните имена!");
 
-        try {
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (!user) throw new Error("Сначала войдите в аккаунт!");
-
-            const p1 = document.getElementById('partner1').value.trim();
-            const p2 = document.getElementById('partner2').value.trim();
-            const mDate = document.getElementById('m_date').value.trim();
-            const vow = document.getElementById('vow').value.trim();
-
-            if (!p1 || !p2) throw new Error("Укажите ники обоих супругов!");
-
-            const contentStr = Супруг 1: ${p1} | Супруг 2: ${p2} | Дата: ${mDate} | Клятва: ${vow};
-
-            const { error } = await supabaseClient
-                .from('requests')
-                .insert([{ 
-                    user_id: user.id, 
-                    type: 'Брак', 
-                    content: contentStr,
-                    status: 'pending' 
-                }]);
-
-            if (error) throw error;
-
-            document.getElementById('msg').style.color = "#4ade80";
-            document.getElementById('msg').innerHTML = "❤️ Заявка подана! Счастья молодым!";
-            setTimeout(() => { window.location.href = "dashboard.html"; }, 2500);
-
-На Рыбалке, [26.02.2026 18:58]
-} catch (err) {
-            alert("Ошибка: " + err.message);
-            btn.disabled = false;
-            btn.innerText = "Заключить союз";
-        }
-    }
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        const { error } = await supabaseClient.from('requests').insert([{
+            user_id: user.id, type: 'Брак', content: Супруги: ${p1} и ${p2}, status: 'pending'
+        }]);
+        if(!error) { alert("Заявление подано!"); window.location.href="dashboard.html"; }
+    });
 </script>
 </body>
 </html>
