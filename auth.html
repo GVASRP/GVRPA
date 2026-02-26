@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Вход | Greenville RP</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: #1e1e1e; padding: 30px; border-radius: 10px; width: 300px; border: 1px solid #333; }
+        input { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; background: #222; border: 1px solid #444; color: white; border-radius: 5px; }
+        button { width: 100%; padding: 10px; background: #007bff; border: none; color: white; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .link { color: #007bff; cursor: pointer; font-size: 14px; text-align: center; display: block; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2 id="title">Вход</h2>
+    <div id="reg-fields" style="display: none;">
+        <input type="text" id="tg_tag" placeholder="Твой тег в Telegram (@name)">
+    </div>
+    <input type="text" id="username" placeholder="Логин (Ник в игре)">
+    <input type="password" id="password" placeholder="Пароль">
+    <button onclick="handleAuth()" id="btn">Войти</button>
+    <span class="link" onclick="toggleMode()" id="toggleText">Нет аккаунта? Регистрация</span>
+</div>
+
+<script>
+    const SUPABASE_URL = 'ТВОЙ_URL';
+    const SUPABASE_KEY = 'ТВОЙ_KEY';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let isLogin = true;
+
+    function toggleMode() {
+        isLogin = !isLogin;
+        document.getElementById('title').innerText = isLogin ? 'Вход' : 'Регистрация';
+        document.getElementById('btn').innerText = isLogin ? 'Войти' : 'Создать аккаунт';
+        document.getElementById('reg-fields').style.display = isLogin ? 'none' : 'block';
+        document.getElementById('toggleText').innerText = isLogin ? 'Нет аккаунта? Регистрация' : 'Есть аккаунт? Войти';
+    }
+
+    async function handleAuth() {
+        const user = document.getElementById('username').value;
+        const pass = document.getElementById('password').value;
+        const tg = document.getElementById('tg_tag').value;
+        
+        // Хитрость: превращаем логин в формат email для базы
+        const fakeEmail = user + "@rp.local";
+
+        if (isLogin) {
+            const { error } = await supabaseClient.auth.signInWithPassword({ email: fakeEmail, password: pass });
+            if (error) alert("Ошибка: " + error.message);
+            else window.location.href = "dashboard.html";
+        } else {
+            // 1. Регистрация аккаунта
+            const { data, error } = await supabaseClient.auth.signUp({ email: fakeEmail, password: pass });
+            if (error) return alert(error.message);
+
+            // 2. Сохраняем ник и ТГ в таблицу профилей
+            const { error: profileError } = await supabaseClient
+                .from('profiles')
+                .insert([{ id: data.user.id, username: user, tg_tag: tg }]);
+            
+            if (profileError) alert("Ошибка профиля: " + profileError.message);
+            else alert("Успех! Теперь войдите.");
+        }
+    }
+</script>
+</body>
+</html>
