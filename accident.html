@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отчет о ДТП | Wisconsin State Patrol</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --bg: #0f111a; --card: #1a1d2e; --accent: #3b82f6; --warning: #facc15; --text: #e2e8f0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
+        .form-container { background: var(--card); padding: 30px; border-radius: 15px; width: 100%; max-width: 600px; border: 1px solid #2d334d; }
+        .header-box { text-align: center; border-bottom: 2px solid var(--warning); margin-bottom: 25px; padding-bottom: 10px; }
+        h2 { color: var(--text); margin: 0; text-transform: uppercase; letter-spacing: 1px; }
+        p.state { color: var(--warning); font-weight: bold; margin: 5px 0; font-size: 12px; }
+        
+        label { display: block; margin: 15px 0 5px; font-size: 13px; color: #94a3b8; font-weight: bold; }
+        input, textarea, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #2d334d; background: #0f111a; color: white; box-sizing: border-box; }
+        textarea { height: 100px; resize: vertical; }
+        
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        button { width: 100%; padding: 15px; margin-top: 25px; background: var(--accent); border: none; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        button:hover { background: #2563eb; }
+        .back-btn { display: inline-block; margin-bottom: 20px; color: #94a3b8; text-decoration: none; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <a href="dashboard.html" class="back-btn">← Вернуться</a>
+    <div class="header-box">
+        <h2>Motor Vehicle Crash Report</h2>
+        <p class="state">STATE OF WISCONSIN | DEPARTMENT OF TRANSPORTATION</p>
+    </div>
+    
+    <div class="grid">
+        <div>
+            <label>Дата и время ДТП</label>
+            <input type="text" id="crash_time" placeholder="02/26/2026 14:30">
+        </div>
+        <div>
+            <label>Место (Трасса/Улица)</label>
+            <input type="text" id="crash_loc" placeholder="Hwy 12 / Madison Ave">
+        </div>
+    </div>
+
+    <label>Участники (Ники и Марки авто)</label>
+    <textarea id="drivers" placeholder="Водитель 1: Nick (Ford)\nВодитель 2: Nick (Chevy)"></textarea>
+
+    <label>Обстоятельства происшествия</label>
+    <textarea id="description" placeholder="Опишите, как произошло ДТП (кто подрезал, превышение и т.д.)"></textarea>
+
+    <div class="grid">
+        <div>
+            <label>Наличие страховки?</label>
+            <select id="insurance">
+                <option value="Да">Да (Full Coverage)</option>
+                <option value="Нет">Нет (Liability only)</option>
+            </select>
+        </div>
+        <div>
+            <label>Был ли вызван Шериф?</label>
+            <select id="police">
+                <option value="Да">Да, офицер на месте</option>
+                <option value="Нет">Нет, европротокол</option>
+            </select>
+        </div>
+    </div>
+
+    <label>Описание повреждений и фото (ссылка)</label>
+    <input type="text" id="damage" placeholder="Разбита фара, помят капот. Ссылка на фото">
+
+    <button id="mainBtn" onclick="submitAccident()">Отправить отчет в Департамент</button>
+    <p id="msg" style="text-align: center; margin-top: 15px;"></p>
+</div>
+
+<script>
+    const S_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
+    const S_KEY = 'ТВОЙ_КЛЮЧ'; // Вставь свой ключ!
+    const supabaseClient = supabase.createClient(S_URL, S_KEY);
+
+    async function submitAccident() {
+        const btn = document.getElementById('mainBtn');
+        btn.disabled = true;
+        btn.innerText = "Регистрация отчета...";
+
+try {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) throw new Error("Авторизуйтесь!");
+
+            const time = document.getElementById('crash_time').value;
+            const loc = document.getElementById('crash_loc').value;
+            const desc = document.getElementById('description').value;
+            const drivers = document.getElementById('drivers').value;
+            const ins = document.getElementById('insurance').value;
+            const pol = document.getElementById('police').value;
+            const dmg = document.getElementById('damage').value;
+
+            const contentStr = Место: ${loc} | Время: ${time} | Участники: ${drivers} | Обстоятельства: ${desc} | Полиция: ${pol} | Страховка: ${ins} | Ущерб: ${dmg};
+
+            const { error } = await supabaseClient
+                .from('requests')
+                .insert([{ 
+                    user_id: user.id, 
+                    type: 'ДТП', 
+                    content: contentStr,
+                    status: 'pending' 
+                }]);
+
+            if (error) throw error;
+
+            document.getElementById('msg').innerHTML = "✅ Отчет о ДТП успешно подан!";
+            setTimeout(() => { window.location.href = "dashboard.html"; }, 2500);
+
+        } catch (err) {
+            alert("Ошибка: " + err.message);
+            btn.disabled = false;
+        }
+    }
+</script>
+</body>
+</html>
