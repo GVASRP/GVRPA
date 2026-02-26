@@ -10,7 +10,6 @@
         .form-container { max-width: 500px; margin: 50px auto; background: var(--card); padding: 30px; border-radius: 15px; border: 1px solid #2d334d; }
         h2 { text-align: center; color: white; margin-bottom: 20px; }
         input, textarea { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #2d334d; background: #0d1117; color: white; box-sizing: border-box; outline: none; }
-        textarea { resize: none; }
         .btn-send { width: 100%; padding: 15px; background: var(--accent); color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 15px; transition: 0.3s; }
         .btn-send:hover { opacity: 0.8; }
         .back-btn { display: block; text-align: center; margin-top: 20px; color: #94a3b8; text-decoration: none; font-size: 14px; }
@@ -20,8 +19,8 @@
 
 <div class="form-container">
     <h2>⚖️ Подача судебного иска</h2>
-    <input type="text" id="plaintiff" placeholder="Истец (Ваше имя)">
-    <input type="text" id="defendant" placeholder="Ответчик (на кого/что подаете)">
+    <input type="text" id="plaintiff" placeholder="Истец (Ваше имя и ваш юз)">
+    <input type="text" id="defendant" placeholder="Ответчик (на кого/что подаете в суд обвиняемого)">
     <textarea id="reason" rows="5" placeholder="Суть иска и ваши требования..."></textarea>
     
     <button class="btn-send" id="submitBtn">Подать в суд</button>
@@ -30,16 +29,17 @@
 
 <script>
     const S_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
-    const S_KEY = 'ВСТАВЬ_СВОЙ_ДЛИННЫЙ_КЛЮЧ'; 
+    const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
     const supabaseClient = supabase.createClient(S_URL, S_KEY);
 
     async function handleCourt() {
-        const plaintiff = document.getElementById('plaintiff').value;
-        const defendant = document.getElementById('defendant').value;
-        const reason = document.getElementById('reason').value;
+        const p = document.getElementById('plaintiff').value;
+        const d = document.getElementById('defendant').value;
+        const r = document.getElementById('reason').value;
 
-        if (!plaintiff  !defendant  !reason) {
-            alert("Пожалуйста, заполните все поля искового заявления!");
+        // Упрощенная проверка без восклицательных знаков для чистоты
+        if (p == ""  d == ""  r == "") {
+            alert("Пожалуйста, заполните все поля!");
             return;
         }
 
@@ -48,15 +48,15 @@
         btn.innerText = "Регистрация...";
 
         try {
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            
-            if (!user) {
+            const { data: authData } = await supabaseClient.auth.getUser();
+            const user = authData.user;
+
+            if (user == null) {
                 alert("Ошибка: Вы не вошли в аккаунт!");
                 return;
             }
 
-            // Формируем текст иска через обычное сложение строк
-            const finalContent = "Истец: " + plaintiff + " | Ответчик: " + defendant + " | Суть: " + reason;
+            const finalContent = "Истец: " + p + " | Ответчик: " + d + " | Суть: " + r;
 
             const { error } = await supabaseClient
                 .from('requests')
@@ -69,22 +69,22 @@
                     }
                 ]);
 
-            if (error) throw error;
-
-            alert("Иск успешно подан!");
-            window.location.href = "dashboard.html";
+            if (error) {
+                alert("Ошибка базы: " + error.message);
+            } else {
+                alert("Иск успешно подан!");
+                window.location.href = "dashboard.html";
+            }
 
         } catch (err) {
-            alert("Ошибка суда: " + err.message);
-            console.error(err);
+            alert("Критическая ошибка: " + err.message);
         } finally {
             btn.disabled = false;
             btn.innerText = "Подать в суд";
         }
     }
 
-    // Привязываем функцию к кнопке
-    document.getElementById('submitBtn').addEventListener('click', handleCourt);
+    document.getElementById('submitBtn').onclick = handleCourt;
 </script>
 
 </body>
