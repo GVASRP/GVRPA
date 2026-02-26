@@ -2,97 +2,43 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Судебная система | GVRPA</title>
+    <title>Судебный иск | GVRPA</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --bg: #0f111a; --card: #1a1d2e; --accent: #fbbf24; --text: #e2e8f0; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
-        .form-container { background: var(--card); padding: 30px; border-radius: 15px; width: 100%; max-width: 600px; border: 1px solid #2d334d; }
-        h2 { text-align: center; color: var(--accent); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
-        p.subtitle { text-align: center; font-size: 13px; color: #94a3b8; margin-bottom: 25px; }
-        label { display: block; margin: 15px 0 5px; font-size: 14px; color: #94a3b8; font-weight: bold; }
-        input, textarea, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #2d334d; background: #0f111a; color: white; box-sizing: border-box; }
-        textarea { height: 120px; resize: vertical; }
-        button { width: 100%; padding: 15px; margin-top: 25px; background: var(--accent); border: none; color: #000; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #f59e0b; }
-        button:disabled { background: #444; color: #888; }
-        .back-btn { display: inline-block; margin-bottom: 20px; color: #94a3b8; text-decoration: none; font-size: 14px; }
+        :root { --bg: #0f111a; --card: #1a1d2e; --accent: #f59e0b; --text: #e2e8f0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+        .form-container { max-width: 500px; margin: 0 auto; background: var(--card); padding: 30px; border-radius: 15px; border: 1px solid #2d334d; }
+        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #2d334d; background: #0d1117; color: white; box-sizing: border-box; }
+        .btn-send { width: 100%; padding: 15px; background: var(--accent); color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 15px; }
     </style>
 </head>
 <body>
-
-<div class="form-container">
-    <a href="dashboard.html" class="back-btn">← Вернуться в кабинет</a>
-    <h2> Суд GVRPA</h2>
-    <p class="subtitle">Исковое заявление о нарушении прав и свобод</p>
-    
-    <label>Истец (Ваш Ник и ФИО)</label>
-    <input type="text" id="claimant" placeholder="Иван Иванов (RobloxNick)">
-
-    <label>Ответчик (Ник того, на кого/что жалуетесь)</label>
-    <input type="text" id="defendant" placeholder="Ник нарушителя или название организации">
-
-    <label>Суть искового заявления</label>
-    <textarea id="reason" placeholder="Подробно опишите ситуацию, дату и время инцидента..."></textarea>
-
-    <label>Доказательства (Ссылки на скрины/фрапс)</label>
-    <input type="text" id="evidence" placeholder="Imgur, YouTube, Discord links">
-
-    <label>Требования к ответчику</label>
-    <input type="text" id="demands" placeholder="Например: Выплатить компенсацию или уволить сотрудника">
-
-    <button id="mainBtn" onclick="submitClaim()">Подать иск в суд</button>
-    <p id="msg" style="text-align: center; margin-top: 15px;"></p>
-</div>
+    <div class="form-container">
+        <h2 style="text-align: center;">⚖️ Подача иска</h2>
+        <input type="text" id="pl" placeholder="Истец (Ваше имя и юз)">
+        <input type="text" id="df" placeholder="Ответчик">
+        <textarea id="rs" rows="4" placeholder="Суть иска"></textarea>
+        <button class="btn-send" id="submitBtn">Подать в суд</button>
+        <a href="dashboard.html" style="display:block; text-align:center; margin-top:20px; color:#94a3b8; text-decoration:none;">← Назад</a>
+    </div>
 
 <script>
-    const S_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co'; 
-    const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk'; 
-    
+    const S_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
+    const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
     const supabaseClient = supabase.createClient(S_URL, S_KEY);
 
-    async function submitClaim() {
-        const btn = document.getElementById('mainBtn');
-        btn.disabled = true;
-        btn.innerText = "Регистрация иска...";
+    document.getElementById('submitBtn').addEventListener('click', async () => {
+        const pl = document.getElementById('pl').value;
+        const df = document.getElementById('df').value;
+        const rs = document.getElementById('rs').value;
+        if(!pl  !df  !rs) return alert("Заполните поля!");
 
-        try {
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (!user) throw new Error("Вы должны быть авторизованы!");
-
-            const claimant = document.getElementById('claimant').value.trim();
-            const defendant = document.getElementById('defendant').value.trim();
-            const reason = document.getElementById('reason').value.trim();
-            const evidence = document.getElementById('evidence').value.trim();
-            const demands = document.getElementById('demands').value.trim();
-
-            if (!claimant  !defendant  !reason) throw new Error("Заполните основные поля иска!");
-
-            const contentStr = Истец: ${claimant} | Ответчик: ${defendant} | Суть: ${reason} | Улики: ${evidence} | Требования: ${demands};
-
-На Рыбалке, [26.02.2026 19:03]
-const { error } = await supabaseClient
-                .from('requests')
-                .insert([{ 
-                    user_id: user.id, 
-                    type: 'Суд', 
-                    content: contentStr,
-                    status: 'pending' 
-                }]);
-
-            if (error) throw error;
-
-            document.getElementById('msg').style.color = "#4ade80";
-            document.getElementById('msg').innerHTML = "⚖️ Иск принят к рассмотрению!";
-            setTimeout(() => { window.location.href = "dashboard.html"; }, 2500);
-
-        } catch (err) {
-            alert("Ошибка: " + err.message);
-            btn.disabled = false;
-            btn.innerText = "Подать иск в суд";
-        }
-    }
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        const { error } = await supabaseClient.from('requests').insert([{
+            user_id: user.id, type: 'Суд', content: Истец: ${pl} | Ответчик: ${df} | Иск: ${rs}, status: 'pending'
+        }]);
+        if(!error) { alert("Иск зарегистрирован!"); window.location.href="dashboard.html"; }
+    });
 </script>
 </body>
 </html>
