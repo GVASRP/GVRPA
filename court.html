@@ -6,39 +6,86 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --bg: #0f111a; --card: #1a1d2e; --accent: #f59e0b; --text: #e2e8f0; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
-        .form-container { max-width: 500px; margin: 0 auto; background: var(--card); padding: 30px; border-radius: 15px; border: 1px solid #2d334d; }
-        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #2d334d; background: #0d1117; color: white; box-sizing: border-box; }
-        .btn-send { width: 100%; padding: 15px; background: var(--accent); color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 15px; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; margin: 0; }
+        .form-container { max-width: 500px; margin: 50px auto; background: var(--card); padding: 30px; border-radius: 15px; border: 1px solid #2d334d; }
+        h2 { text-align: center; color: white; margin-bottom: 20px; }
+        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #2d334d; background: #0d1117; color: white; box-sizing: border-box; outline: none; }
+        textarea { resize: none; }
+        .btn-send { width: 100%; padding: 15px; background: var(--accent); color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 15px; transition: 0.3s; }
+        .btn-send:hover { opacity: 0.8; }
+        .back-btn { display: block; text-align: center; margin-top: 20px; color: #94a3b8; text-decoration: none; font-size: 14px; }
     </style>
 </head>
 <body>
-    <div class="form-container">
-        <h2 style="text-align: center;">⚖️ Подача иска</h2>
-        <input type="text" id="pl" placeholder="Истец (Ваше имя и юз)">
-        <input type="text" id="df" placeholder="Ответчик">
-        <textarea id="rs" rows="4" placeholder="Суть иска"></textarea>
-        <button class="btn-send" id="submitBtn">Подать в суд</button>
-        <a href="dashboard.html" style="display:block; text-align:center; margin-top:20px; color:#94a3b8; text-decoration:none;">← Назад</a>
-    </div>
+
+<div class="form-container">
+    <h2>⚖️ Подача судебного иска</h2>
+    <input type="text" id="plaintiff" placeholder="Истец (Ваше имя)">
+    <input type="text" id="defendant" placeholder="Ответчик (на кого/что подаете)">
+    <textarea id="reason" rows="5" placeholder="Суть иска и ваши требования..."></textarea>
+    
+    <button class="btn-send" id="submitBtn">Подать в суд</button>
+    <a href="dashboard.html" class="back-btn">← Вернуться назад</a>
+</div>
 
 <script>
     const S_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
-    const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
+    const S_KEY = 'ВСТАВЬ_СВОЙ_ДЛИННЫЙ_КЛЮЧ'; 
     const supabaseClient = supabase.createClient(S_URL, S_KEY);
 
-    document.getElementById('submitBtn').addEventListener('click', async () => {
-        const pl = document.getElementById('pl').value;
-        const df = document.getElementById('df').value;
-        const rs = document.getElementById('rs').value;
-        if(!pl  !df  !rs) return alert("Заполните поля!");
+    async function handleCourt() {
+        const plaintiff = document.getElementById('plaintiff').value;
+        const defendant = document.getElementById('defendant').value;
+        const reason = document.getElementById('reason').value;
 
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        const { error } = await supabaseClient.from('requests').insert([{
-            user_id: user.id, type: 'Суд', content: Истец: ${pl} | Ответчик: ${df} | Иск: ${rs}, status: 'pending'
-        }]);
-        if(!error) { alert("Иск зарегистрирован!"); window.location.href="dashboard.html"; }
-    });
+        if (!plaintiff  !defendant  !reason) {
+            alert("Пожалуйста, заполните все поля искового заявления!");
+            return;
+        }
+
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerText = "Регистрация...";
+
+        try {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            
+            if (!user) {
+                alert("Ошибка: Вы не вошли в аккаунт!");
+                return;
+            }
+
+            // Формируем текст иска через обычное сложение строк
+            const finalContent = "Истец: " + plaintiff + " | Ответчик: " + defendant + " | Суть: " + reason;
+
+            const { error } = await supabaseClient
+                .from('requests')
+                .insert([
+                    { 
+                        user_id: user.id, 
+                        type: 'Суд', 
+                        content: finalContent, 
+                        status: 'pending' 
+                    }
+                ]);
+
+            if (error) throw error;
+
+            alert("Иск успешно подан!");
+            window.location.href = "dashboard.html";
+
+        } catch (err) {
+            alert("Ошибка суда: " + err.message);
+            console.error(err);
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Подать в суд";
+        }
+    }
+
+    // Привязываем функцию к кнопке
+    document.getElementById('submitBtn').addEventListener('click', handleCourt);
 </script>
+
 </body>
 </html>
