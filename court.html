@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Судебный иск | GVRPA</title>
+    <title>Судебный иск | Wisconsin</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --bg: #0f111a; --card: #1a1d2e; --accent: #f59e0b; --text: #e2e8f0; }
@@ -19,72 +19,72 @@
 
 <div class="form-container">
     <h2>⚖️ Подача судебного иска</h2>
-    <input type="text" id="plaintiff" placeholder="Истец (Ваше имя и ваш юз)">
-    <input type="text" id="defendant" placeholder="Ответчик (на кого/что подаете в суд обвиняемого)">
-    <textarea id="reason" rows="5" placeholder="Суть иска и ваши требования..."></textarea>
+    <input type="text" id="plaintiff" placeholder="Истец (Ваше имя и юз)">
+    <input type="text" id="defendant" placeholder="Ответчик (на что/кого подаете в суд )">
+    <textarea id="reason" rows="5" placeholder="Суть иска..."></textarea>
     
     <button class="btn-send" id="submitBtn">Подать в суд</button>
     <a href="dashboard.html" class="back-btn">← Вернуться назад</a>
 </div>
 
 <script>
+    // Подключение
     const S_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
-    const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
+    const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk'; 
     const supabaseClient = supabase.createClient(S_URL, S_KEY);
 
-    async function handleCourt() {
-        const p = document.getElementById('plaintiff').value;
-        const d = document.getElementById('defendant').value;
-        const r = document.getElementById('reason').value;
+    // Основная функция
+    async function startSending() {
+        const val1 = document.getElementById('plaintiff').value;
+        const val2 = document.getElementById('defendant').value;
+        const val3 = document.getElementById('reason').value;
 
-        // Упрощенная проверка без восклицательных знаков для чистоты
-        if (p == ""  d == ""  r == "") {
-            alert("Пожалуйста, заполните все поля!");
+        if (val1 === ""  val2 === ""  val3 === "") {
+            alert("Заполните все поля!");
             return;
         }
 
-        const btn = document.getElementById('submitBtn');
-        btn.disabled = true;
-        btn.innerText = "Регистрация...";
+        const b = document.getElementById('submitBtn');
+        b.disabled = true;
+        b.innerText = "Отправка...";
 
         try {
-            const { data: authData } = await supabaseClient.auth.getUser();
-            const user = authData.user;
+            const userResponse = await supabaseClient.auth.getUser();
+            const myUser = userResponse.data.user;
 
-            if (user == null) {
-                alert("Ошибка: Вы не вошли в аккаунт!");
+            if (!myUser) {
+                alert("Вы не вошли в систему!");
                 return;
             }
 
-            const finalContent = "Истец: " + p + " | Ответчик: " + d + " | Суть: " + r;
+            const infoStr = "Истец: " + val1 + " | Ответчик: " + val2 + " | Суть: " + val3;
 
-            const { error } = await supabaseClient
-                .from('requests')
-                .insert([
-                    { 
-                        user_id: user.id, 
-                        type: 'Суд', 
-                        content: finalContent, 
-                        status: 'pending' 
-                    }
-                ]);
+            const finalData = {
+                user_id: myUser.id,
+                type: "Суд",
+                content: infoStr,
+                status: "pending"
+            };
 
-            if (error) {
-                alert("Ошибка базы: " + error.message);
+            const dbResponse = await supabaseClient.from('requests').insert([finalData]);
+
+            if (dbResponse.error) {
+                alert("Ошибка базы: " + dbResponse.error.message);
             } else {
                 alert("Иск успешно подан!");
                 window.location.href = "dashboard.html";
             }
 
         } catch (err) {
-            alert("Критическая ошибка: " + err.message);
+            alert("Ошибка: " + err.message);
         } finally {
-            btn.disabled = false;
-            btn.innerText = "Подать в суд";
+            b.disabled = false;
+            b.innerText = "Подать в суд";
         }
     }
 
-    document.getElementById('submitBtn').onclick = handleCourt;
+    // Привязка клика
+    document.getElementById('submitBtn').onclick = startSending;
 </script>
 
 </body>
