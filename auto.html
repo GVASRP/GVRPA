@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация ТС | GVRPA</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -10,8 +11,9 @@
         .form-container { background: var(--card); padding: 30px; border-radius: 15px; width: 100%; max-width: 500px; border: 1px solid #2d334d; }
         h2 { text-align: center; color: var(--accent); }
         label { display: block; margin: 15px 0 5px; font-size: 14px; color: #94a3b8; }
-        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #2d334d; background: #0f111a; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 15px; margin-top: 25px; background: var(--accent); border: none; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #2d334d; background: #0f111a; color: white; box-sizing: border-box; margin-bottom: 10px; }
+        button { width: 100%; padding: 15px; margin-top: 15px; background: var(--accent); border: none; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        button:disabled { background: #444; cursor: not-allowed; }
         .back-btn { display: inline-block; margin-bottom: 20px; color: #94a3b8; text-decoration: none; font-size: 14px; }
     </style>
 </head>
@@ -19,47 +21,57 @@
 
 <div class="form-container">
     <a href="dashboard.html" class="back-btn">← Назад в меню</a>
-    <h2>Регистрация транспортного средства</h2>
+    <h2>Регистрация автомобиля</h2>
     
-    <label>Марка и модель автомобиля</label>
+    <label>Марка и модель</label>
     <input type="text" id="car_model" placeholder="Например: 2021 Audi R8">
     
-    <label>Номер автомобиля (В форме AAA-111)</label>
+    <label>Гос. номер (AAA-111)</label>
     <input type="text" id="car_plate" placeholder="Например: AAA-111">
     
-    <label>Цвет ТС</label>
+    <label>Цвет</label>
     <input type="text" id="car_color" placeholder="Черный металлик">
 
-    <button id="submit-btn" onclick="submitRequest()">Отправить заявление</button>
+    <button id="mainBtn" onclick="submitRequest()">Отправить заявление</button>
     <p id="msg" style="text-align: center; margin-top: 15px;"></p>
 </div>
 
 <script>
-    const SUPABASE_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // ПРОВЕРЬ ЭТИ ДАННЫЕ ВНИМАТЕЛЬНО
+    const S_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co'; 
+    const S_KEY = 'ВСТАВЬ_СЮДА_ДЛИННЫЙ_КЛЮЧ_EYJ'; 
+    
+    const supabaseClient = supabase.createClient(S_URL, S_KEY);
 
     async function submitRequest() {
-        const btn = document.getElementById('submit-btn');
+        const btn = document.getElementById('mainBtn');
         const msg = document.getElementById('msg');
         
+        // Сразу блокируем кнопку, чтобы не нажимали дважды
+        btn.disabled = true;
+        btn.innerText = "Проверка данных...";
+
         try {
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (!user) throw new Error("Пользователь не авторизован!");
-
-            const model = document.getElementById('car_model').value;
-            const plate = document.getElementById('car_plate').value;
-            const color = document.getElementById('car_color').value;
-
-            if(!model || !plate) {
-                alert("Заполните основные поля!");
-                return;
+            // 1. Проверяем пользователя
+            const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+            
+            if (authError || !user) {
+                throw new Error("Вы не авторизованы. Войдите заново.");
             }
 
-            btn.disabled = true;
-            btn.innerText = "Отправка...";
+            // 2. Берем данные из полей
+            const model = document.getElementById('car_model').value.trim();
+            const plate = document.getElementById('car_plate').value.trim();
+            const color = document.getElementById('car_color').value.trim();
 
-            const { error } = await supabaseClient
+            if (!model || !plate) {
+                throw new Error("Заполните модель и номер!");
+            }
+
+            btn.innerText = "Отправка в базу...";
+
+            // 3. Отправляем в Supabase
+            const { error: dbError } = await supabaseClient
                 .from('requests')
                 .insert([{ 
                     user_id: user.id, 
@@ -68,10 +80,11 @@
                     status: 'pending' 
                 }]);
 
-            if (error) throw error;
+            if (dbError) throw dbError;
 
+            // 4. Успех
             msg.style.color = "#4ade80";
-            msg.innerHTML = "✅ Заявка успешно отправлена!";
+            msg.innerText = "✅ Успешно! Перенаправление...";
             setTimeout(() => { window.location.href = "dashboard.html"; }, 2000);
 
         } catch (err) {
