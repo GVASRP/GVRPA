@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Водительское удостоверение | GVRPA</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --bg: #0f111a; --card: #1a1d2e; --accent: #3b82f6; --text: #e2e8f0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
+        .form-container { background: var(--card); padding: 30px; border-radius: 15px; width: 100%; max-width: 550px; border: 1px solid #2d334d; }
+        h2 { text-align: center; color: var(--accent); margin-bottom: 5px; }
+        p.subtitle { text-align: center; color: #888; font-size: 14px; margin-bottom: 25px; }
+        label { display: block; margin: 15px 0 5px; font-size: 13px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+        input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #2d334d; background: #0f111a; color: white; box-sizing: border-box; }
+        .grid-half { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        button { width: 100%; padding: 15px; margin-top: 25px; background: var(--accent); border: none; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        button:disabled { background: #444; }
+        .back-btn { display: inline-block; margin-bottom: 20px; color: #94a3b8; text-decoration: none; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <a href="dashboard.html" class="back-btn">← Меню услуг</a>
+    <h2>DRIVING LICENSE</h2>
+    <p class="subtitle">Заявление на регистрацию водительского удостоверения</p>
+    
+    <label>Full Name (Имя и Фамилия)</label>
+    <input type="text" id="p_name" placeholder="John Doe">
+
+    <div class="grid-half">
+        <div>
+            <label>D.O.B (Дата рождения)</label>
+            <input type="text" id="p_dob" placeholder="ДД.ММ.ГГГГ">
+        </div>
+        <div>
+            <label>Категория</label>
+            <select id="p_cat">
+                <option value="A">A - Траки /  большие Прицепы</option>
+                <option value="B">B - Легковые (Механика)</option>
+                <option value="C">C - Средние Траки/прицепы</option>
+            </select>
+        </div>
+    </div>
+    
+    <label>Ваш адрес проживания</label>
+    <input type="text" id="p_address" placeholder="Город, улица, дом">
+
+    <div class="grid-half">
+        <div>
+            <label>Дата выдачи</label>
+            <input type="text" id="p_date_start" placeholder="ДД.ММ.ГГГГ">
+        </div>
+        <div>
+            <label>Срок действия</label>
+            <input type="text" value="10 лет" id="p_duration" readonly>
+        </div>
+    </div>
+
+    <hr style="margin: 25px 0; border: 0; border-top: 1px solid #2d334d;">
+
+    <label>Экзаменатор (Telegram @)</label>
+    <input type="text" id="exam_tg" placeholder="@username">
+
+    <label>Экзаменатор (Roblox Nick)</label>
+    <input type="text" id="exam_rbx" placeholder="Nickname">
+
+    <button id="mainBtn" onclick="submitLicense()">Зарегистрировать лицензию</button>
+    <p id="msg" style="text-align: center; margin-top: 15px;"></p>
+</div>
+
+<script>
+    const S_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co'; 
+    const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk'; 
+    
+    const supabaseClient = supabase.createClient(S_URL, S_KEY);
+
+    async function submitLicense() {
+        const btn = document.getElementById('mainBtn');
+        btn.disabled = true;
+        btn.innerText = "Регистрация...";
+
+        try {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) throw new Error("Авторизуйтесь в системе!");
+const name = document.getElementById('p_name').value;
+            const dob = document.getElementById('p_dob').value;
+            const cat = document.getElementById('p_cat').value;
+            const addr = document.getElementById('p_address').value;
+            const dStart = document.getElementById('p_date_start').value;
+            const exTg = document.getElementById('exam_tg').value;
+            const exRbx = document.getElementById('exam_rbx').value;
+
+            if(!name || !exTg) throw new Error("Заполните имя и данные экзаменатора!");
+
+            const contentStr = 'Имя: ' + name + ' | DOB: ' + dob + ' | Кат: ' + cat + ' | Адрес: ' + addr + ' | Выдано: ' + dStart + ' | Экзаменатор: ' + exTg + ' (' + exRbx + ')';
+
+            const { error } = await supabaseClient
+                .from('requests')
+                .insert([{ 
+                    user_id: user.id, 
+                    type: 'Лицензия', 
+                    content: contentStr,
+                    status: 'pending' 
+                }]);
+
+            if (error) throw error;
+
+            document.getElementById('msg').innerHTML = "✅ Лицензия успешно зарегистрирована!";
+            setTimeout(() => { window.location.href = "dashboard.html"; }, 2000);
+
+        } catch (err) {
+            alert("Ошибка: " + err.message);
+            btn.disabled = false;
+            btn.innerText = "Зарегистрировать лицензию";
+        }
+    }
+</script>
+</body>
+</html>
