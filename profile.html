@@ -10,117 +10,106 @@
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
         .container { max-width: 800px; margin: 0 auto; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .back-btn { color: #94a3b8; text-decoration: none; font-size: 14px; }
-        
-        .request-card { 
-            background: var(--card); border: 1px solid #2d334d; border-radius: 12px; 
-            padding: 20px; margin-bottom: 15px; position: relative;
-        }
-        .type-tag { 
-            display: inline-block; padding: 4px 10px; border-radius: 6px; 
-            font-size: 12px; font-weight: bold; text-transform: uppercase; margin-bottom: 10px;
-        }
-        .status-badge { 
-            position: absolute; top: 20px; right: 20px; 
-            padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;
-        }
-        
-        /* Цвета статусов */
+        .back-btn { color: #94a3b8; text-decoration: none; font-size: 14px; border: 1px solid #2d334d; padding: 5px 10px; border-radius: 5px; }
+        .request-card { background: var(--card); border: 1px solid #2d334d; border-radius: 12px; padding: 20px; margin-bottom: 15px; position: relative; }
+        .status-badge { position: absolute; top: 20px; right: 20px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
         .status-pending { background: #f59e0b33; color: #f59e0b; border: 1px solid #f59e0b; }
         .status-approved { background: #10b98133; color: #10b981; border: 1px solid #10b981; }
         .status-rejected { background: #ef444433; color: #ef4444; border: 1px solid #ef4444; }
-        
-        /* Цвета типов */
-        .type-car { background: #3b82f6; color: white; }
-        .type-passport { background: #10b981; color: white; }
-        .type-house { background: #f59e0b; color: white; }
-        .type-default { background: #64748b; color: white; }
-
-        .content { font-size: 14px; color: #cbd5e1; line-height: 1.5; }
-        .date { font-size: 12px; color: #64748b; margin-top: 15px; }
-        .no-data { text-align: center; color: #64748b; margin-top: 50px; }
+        .type-tag { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 12px; background: var(--accent); color: white; margin-bottom: 10px; }
+        .error-log { background: #450a0a; color: #fecaca; padding: 15px; border-radius: 8px; border: 1px solid #ef4444; margin-bottom: 20px; display: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <div id="debug-log" class="error-log"></div>
+
     <div class="header">
-        <a href="dashboard.html" class="back-btn">← Вернуться в меню</a>
+        <a href="dashboard.html" class="back-btn">← Назад</a>
         <h2>Мои заявления</h2>
     </div>
 
     <div id="requests-list">
-        <p style="text-align: center;">Загрузка истории...</p>
+        <p style="text-align: center; color: #94a3b8;">🔍 Подключение к базе данных Висконсина...</p>
     </div>
 </div>
 
 <script>
+    // ПРОВЕРЬ ЭТИ ДАННЫЕ!
     const S_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
-    const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
-    const supabaseClient = supabase.createClient(S_URL, S_KEY);
+    const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk'; 
+    
+    const log = document.getElementById('debug-log');
+    const listDiv = document.getElementById('requests-list');
+
+    function showError(msg) {
+        log.style.display = 'block';
+        log.innerText = "ОШИБКА: " + msg;
+        listDiv.innerHTML = '<p style="color: #ef4444; text-align: center;">Загрузка прервана из-за ошибки.</p>';
+    }
 
     async function loadRequests() {
         try {
-            // 1. Получаем текущего пользователя
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (!user) {
-                window.location.href = "index.html";
+            if (S_KEY === 'ВСТАВЬ_СВОЙ_КЛЮЧ_СЮДА') {
+                showError("Вы забыли вставить API ключ в коде profile.html!");
                 return;
             }
 
-            // 2. Достаем его заявки из таблицы
-            const { data: requests, error } = await supabaseClient
+            const supabaseClient = supabase.createClient(S_URL, S_KEY);
+
+            // Проверка авторизации
+            const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+            if (authError || !user) {
+                showError("Пользователь не авторизован. Вернитесь на страницу входа.");
+                return;
+            }
+
+            // Запрос данных
+            const { data: requests, error: dbError } = await supabaseClient
                 .from('requests')
                 .select('*')
                 .eq('user_id', user.id)
                 .order('created_at', { ascending: false });
 
-            if (error) throw error;
-
-            const listDiv = document.getElementById('requests-list');
-            listDiv.innerHTML = '';
-
-            if (requests.length === 0) {
-                listDiv.innerHTML = '<div class="no-data">У вас пока нет поданных заявлений.</div>';
+            if (dbError) {
+                showError("Таблица 'requests' не найдена или доступ запрещен. Проверьте RLS Policy!");
                 return;
             }
 
-            // 3. Выводим каждую заявку
+            listDiv.innerHTML = '';
+
+            if (requests.length === 0) {
+                listDiv.innerHTML = '<p style="text-align: center; color: #64748b;">У вас пока нет заявлений. Попробуйте отправить любое!</p>';
+                return;
+            }
+
             requests.forEach(req => {
                 const card = document.createElement('div');
                 card.className = 'request-card';
 
-                // Определяем класс для статуса
-                let statusClass = 'status-pending';
-                let statusText = 'В ожидании';
-                if (req.status === 'approved') { statusClass = 'status-approved'; statusText = 'Одобрено'; }
-                if (req.status === 'rejected') { statusClass = 'status-rejected'; statusText = 'Отклонено'; }
-
-// Определяем цвет тега типа
-                let typeClass = 'type-default';
-                if (req.type === 'Авто') typeClass = 'type-car';
-                if (req.type === 'Гражданство') typeClass = 'type-passport';
-                if (req.type === 'Недвижимость') typeClass = 'type-house';
+let sClass = 'status-pending';
+                let sText = 'На рассмотрении';
+                if (req.status === 'approved') { sClass = 'status-approved'; sText = 'Одобрено'; }
+                if (req.status === 'rejected') { sClass = 'status-rejected'; sText = 'Отказ'; }
 
                 const date = new Date(req.created_at).toLocaleString('ru-RU');
 
                 card.innerHTML = 
-                    <span class="type-tag ${typeClass}">${req.type}</span>
-                    <span class="status-badge ${statusClass}">${statusText}</span>
-                    <div class="content">${req.content}</div>
-                    <div class="date">Подано: ${date}</div>
+                    <span class="type-tag">${req.type}</span>
+                    <span class="status-badge ${sClass}">${sText}</span>
+                    <div style="margin-top:10px;">${req.content}</div>
+                    <div style="font-size: 11px; color: #64748b; margin-top: 15px;">ID: ${req.id.substring(0,8)}... | ${date}</div>
                 ;
                 listDiv.appendChild(card);
             });
 
-        } catch (err) {
-            console.error(err);
-            document.getElementById('requests-list').innerHTML = '<p style="color:red">Ошибка при загрузке данных.</p>';
+        } catch (e) {
+            showError("Критический сбой: " + e.message);
         }
     }
 
     loadRequests();
 </script>
-
 </body>
 </html>
