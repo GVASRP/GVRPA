@@ -13,18 +13,27 @@
             --text: #e2e8f0;
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        .header { text-align: center; padding: 40px 0; }
-        .user-bar { display: flex; justify-content: space-between; max-width: 1000px; margin: 0 auto; background: var(--card); padding: 15px 25px; border-radius: 12px; margin-bottom: 30px; }
         
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 1000px; margin: 0 auto; }
+        .user-bar { display: flex; justify-content: space-between; align-items: center; max-width: 1000px; margin: 0 auto 30px; background: var(--card); padding: 15px 25px; border-radius: 12px; border: 1px solid #2d334d; }
+        #user-name { font-weight: bold; color: var(--accent); }
         
-        .service-card { background: var(--card); padding: 25px; border-radius: 15px; border: 1px solid #2d334d; transition: 0.3s; cursor: pointer; text-align: center; }
-        .service-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-        .service-card i { font-size: 40px; display: block; margin-bottom: 15px; }
+        .header { text-align: center; margin-bottom: 40px; }
+        h1 { margin: 0; font-size: 32px; letter-spacing: 1px; }
+        .desc { color: #94a3b8; margin-top: 10px; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; max-width: 1000px; margin: 0 auto; }
         
-        .btn-logout { background: #ef4444; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; }
-        h1 { margin: 0; font-size: 28px; }
-        p.desc { color: #94a3b8; margin-bottom: 40px; text-align: center; }
+        .service-card { 
+            background: var(--card); padding: 25px; border-radius: 15px; border: 1px solid #2d334d; 
+            transition: 0.3s; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center;
+        }
+        .service-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+        .service-card span { font-size: 45px; margin-bottom: 15px; display: block; }
+        .service-card h3 { margin: 10px 0 5px 0; font-size: 18px; }
+        .service-card p { font-size: 13px; color: #888; margin: 0; }
+        
+        .btn-logout { background: #ef4444; color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-logout:hover { background: #dc2626; }
     </style>
 </head>
 <body>
@@ -36,42 +45,47 @@
 
 <div class="header">
     <h1>КалтУслуги</h1>
-    <p class="desc">Выберите необходимую услугу для подачи электронного заявления</p>
+    <p class="desc">Официальный портал электронных заявлений GVRPA</p>
 </div>
 
 <div class="grid">
-    <div class="service-card" onclick="openService('Регистрация авто')">
-        <span>🚗</span>
-        <h3>Регистрация авто</h3>
-        <p style="font-size: 13px; color: #888;">Постановка ТС на учет</p>
-    </div>
-
     <div class="service-card" onclick="openService('Гражданство')">
         <span>🛂</span>
         <h3>Гражданство</h3>
-        <p style="font-size: 13px; color: #888;">Оформление ID-карты</p>
+        <p>Оформление ID-карты персонажа</p>
+    </div>
+
+    <div class="service-card" onclick="openService('Регистрация авто')">
+        <span>🚗</span>
+        <h3>Регистрация ТС</h3>
+        <p>Постановка автомобиля на учет</p>
     </div>
 
     <div class="service-card" onclick="openService('Недвижимость')">
         <span>🏠</span>
         <h3>Недвижимость</h3>
-        <p style="font-size: 13px; color: #888;">Регистрация недвижимости</p>
+        <p>Регистрация домов и участков</p>
     </div>
 
     <div class="service-card" onclick="openService('Водительские права')">
         <span>🪪</span>
         <h3>Водительские права</h3>
-        <p style="font-size: 13px; color: #888;">Получение, замена или получение новых категорий</p>
+        <p>Получение лицензий категорий A, B, C</p>
+    </div>
+
+    <div class="service-card" onclick="openService('Правила')">
+        <span>📜</span>
+        <h3>Правила</h3>
+        <p>Устав проекта и ПДД</p>
     </div>
 </div>
 
 <script>
-    // ТВОИ КЛЮЧИ ТУТ
     const SUPABASE_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk'; 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  async function checkUser() {
+    async function checkUser() {
         const { data: { user } } = await supabaseClient.auth.getUser();
         if (!user) {
             window.location.href = "index.html";
@@ -80,10 +94,10 @@
         }
     }
 
-    // ВОТ ТУТ МЫ МЕНЯЕМ:
-  function openService(type) {
+    function openService(type) {
         if (type === 'Регистрация авто') {
-            window.location.href = "auto.html";
+
+window.location.href = "auto.html";
         } 
         else if (type === 'Гражданство') {
             window.location.href = "passport.html";
@@ -91,11 +105,14 @@
         else if (type === 'Недвижимость') {
             window.location.href = "house.html";
         }
-        else if (type === 'Водительские права') { // ДОБАВИЛИ ЭТО
+        else if (type === 'Водительские права') {
             window.location.href = "license.html";
         }
+        else if (type === 'Правила') {
+            window.location.href = "rules.html";
+        }
         else {
-            alert("Этот раздел еще в разработке!");
+            alert("Этот раздел находится в разработке.");
         }
     }
     
@@ -106,3 +123,6 @@
 
     checkUser();
 </script>
+
+</body>
+</html>
