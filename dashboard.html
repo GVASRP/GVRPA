@@ -6,34 +6,17 @@
     <title>КальтУслуги | GVRPA</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root {
-            --bg: #0f111a;
-            --card: #1a1d2e;
-            --accent: #3b82f6;
-            --text: #e2e8f0;
-        }
+        :root { --bg: #0f111a; --card: #1a1d2e; --accent: #3b82f6; --text: #e2e8f0; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        
         .user-bar { display: flex; justify-content: space-between; align-items: center; max-width: 1000px; margin: 0 auto 30px; background: var(--card); padding: 15px 25px; border-radius: 12px; border: 1px solid #2d334d; }
         #user-name { font-weight: bold; color: var(--accent); }
-        
         .header { text-align: center; margin-bottom: 40px; }
-        h1 { margin: 0; font-size: 32px; letter-spacing: 1px; }
-        .desc { color: #94a3b8; margin-top: 10px; }
-
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; max-width: 1000px; margin: 0 auto; }
-        
-        .service-card { 
-            background: var(--card); padding: 25px; border-radius: 15px; border: 1px solid #2d334d; 
-            transition: 0.3s; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center;
-        }
+        .service-card { background: var(--card); padding: 25px; border-radius: 15px; border: 1px solid #2d334d; transition: 0.3s; cursor: pointer; text-align: center; }
         .service-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
-        .service-card span { font-size: 45px; margin-bottom: 15px; display: block; }
-        .service-card h3 { margin: 10px 0 5px 0; font-size: 18px; }
-        .service-card p { font-size: 13px; color: #888; margin: 0; }
-        
-        .btn-logout { background: #ef4444; color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .btn-logout:hover { background: #dc2626; }
+        .service-card span { font-size: 40px; display: block; margin-bottom: 10px; }
+        .btn-logout { background: #ef4444; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; }
+        .btn-profile { margin-left: 15px; background: none; border: 1px solid var(--accent); color: var(--accent); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -41,63 +24,25 @@
 <div class="user-bar">
     <div>
         <span id="user-name">Загрузка...</span>
-        <button onclick="window.location.href='profile.html'" style="margin-left: 15px; background: none; border: 1px solid var(--accent); color: var(--accent); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px;">Мои заявки</button>
+        <button class="btn-profile" onclick="window.location.href='profile.html'">Мои заявки</button>
     </div>
     <button class="btn-logout" onclick="logout()">Выйти</button>
 </div>
 
 <div class="header">
     <h1>КалтУслуги</h1>
-    <p class="desc">Официальный портал электронных заявлений GVRPA</p>
+    <p style="color: #94a3b8;">Официальный портал штата GVRPA</p>
 </div>
 
 <div class="grid">
-    <div class="service-card" onclick="openService('Гражданство')">
-        <span>🛂</span>
-        <h3>Гражданство</h3>
-        <p>Оформление ID-карты персонажа</p>
-    </div>
-
-    <div class="service-card" onclick="openService('Регистрация авто')">
-        <span>🚗</span>
-        <h3>Регистрация ТС</h3>
-        <p>Постановка автомобиля на учет</p>
-    </div>
-
-    <div class="service-card" onclick="openService('ДТП')">
-        <span>💥</span>
-        <h3>Регистрация ДТП</h3>
-        <p>Отчет об аварии для страховой и полиции</p>
-    </div>
-    
-    <div class="service-card" onclick="openService('Брак')">
-        <span>💍</span>
-        <h3>Регистрация брака</h3>
-        <p>Заключение союза между игроками</p>
-    </div>
-
-    <div class="service-card" onclick="openService('Недвижимость')">
-        <span>🏠</span>
-        <h3>Недвижимость</h3>
-        <p>Регистрация домов и участков</p>
-    </div>
-<div class="service-card" onclick="openService('Суд')">
-        <span>⚖️</span>
-        <h3>Суд</h3>
-        <p>Подача исковых заявлений и жалоб</p>
-    </div>
-    
-    <div class="service-card" onclick="openService('Водительские права')">
-        <span>🪪</span>
-        <h3>Водительские права</h3>
-        <p>Получение лицензий категорий A, B, C</p>
-    </div>
-
-    <div class="service-card" onclick="openService('Правила')">
-        <span>📜</span>
-        <h3>Правила</h3>
-        <p>Устав проекта и ПДД</p>
-    </div>
+    <div class="service-card" onclick="openService('Гражданство')"><span>🛂</span><h3>Гражданство</h3><p>ID-карта</p></div>
+    <div class="service-card" onclick="openService('Регистрация авто')"><span>🚗</span><h3>Авто</h3><p>Учет ТС</p></div>
+    <div class="service-card" onclick="openService('Недвижимость')"><span>🏠</span><h3>Дом</h3><p>Регистрация</p></div>
+    <div class="service-card" onclick="openService('Водительские права')"><span>🪪</span><h3>Права</h3><p>Категории A,B,C</p></div>
+    <div class="service-card" onclick="openService('Брак')"><span>💍</span><h3>Брак</h3><p>Регистрация союза</p></div>
+    <div class="service-card" onclick="openService('Суд')"><span>⚖️</span><h3>Суд</h3><p>Иски и жалобы</p></div>
+    <div class="service-card" onclick="openService('ДТП')"><span>💥</span><h3>ДТП</h3><p>Отчет об аварии</p></div>
+    <div class="service-card" onclick="openService('Правила')"><span>📜</span><h3>Правила</h3><p>Устав и ПДД</p></div>
 </div>
 
 <script>
@@ -107,51 +52,28 @@
 
     async function checkUser() {
         const { data: { user } } = await supabaseClient.auth.getUser();
-        if (!user) {
-            window.location.href = "index.html";
-        } else {
-            document.getElementById('user-name').innerText = "👤 Аккаунт: " + user.email.split('@')[0];
-        }
+        if (!user) { window.location.href = "index.html"; }
+        else { document.getElementById('user-name').innerText = "👤 " + user.email.split('@')[0]; }
     }
 
     function openService(type) {
-        if (type === 'Регистрация авто') {
+        const routes = {
+            'Регистрация авто': 'auto.html',
+            'Гражданство': 'passport.html',
+            'Недвижимость': 'house.html',
+            'Водительские права': 'license.html',
 
-window.location.href = "auto.html";
-        } 
-        else if (type === 'Гражданство') {
-            window.location.href = "passport.html";
-        } 
-        else if (type === 'Недвижимость') {
-            window.location.href = "house.html";
-        }
-        else if (type === 'Водительские права') {
-            window.location.href = "license.html";
-        }
-        else if (type === 'Правила') {
-            window.location.href = "rules.html";
-        }
-            else if (type === 'Суд') {
-        window.location.href = "court.html";
-    }
-                else if (type === 'ДТП') {
-        window.location.href = "accident.html";
-    }
-            else if (type === 'Брак') {
-        window.location.href = "marriage.html";
-    }
-        else {
-            alert("Этот раздел находится в разработке.");
-        }
+'Брак': 'marriage.html',
+            'Суд': 'court.html',
+            'ДТП': 'accident.html',
+            'Правила': 'rules.html'
+        };
+        if (routes[type]) { window.location.href = routes[type]; }
+        else { alert("В разработке"); }
     }
     
-    async function logout() {
-        await supabaseClient.auth.signOut();
-        window.location.href = "index.html";
-    }
-
+    async function logout() { await supabaseClient.auth.signOut(); window.location.href = "index.html"; }
     checkUser();
 </script>
-
 </body>
 </html>
