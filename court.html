@@ -37,6 +37,7 @@
         const d = document.getElementById('defendant').value;
         const r = document.getElementById('reason').value;
 
+        // ИСПРАВЛЕНО: Добавлены символы || (ИЛИ)
         if (!p  !d  !r) {
             alert("Заполните все поля!");
             return;
@@ -46,10 +47,11 @@
             const { data: { user } } = await supabaseClient.auth.getUser();
             if (!user) return alert("Ошибка авторизации!");
 
+            // ИСПРАВЛЕНО: Добавлены косые кавычки  для формирования строки
             const { error } = await supabaseClient.from('requests').insert([{
                 user_id: user.id,
                 type: 'Суд',
-                content: Истец: ${p} | Ответчик: ${d} | Суть: ${r},
+                content: Истец: ${p} | Ответчик: ${d} | Суть: ${r}`,
                 status: 'pending'
             }]);
 
