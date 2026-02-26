@@ -47,7 +47,7 @@
         const msg = document.getElementById('msg');
         
         btn.disabled = true;
-        btn.innerText = "Проверка...";
+        btn.innerText = "Отправка...";
 
         try {
             const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
@@ -64,16 +64,16 @@
                 throw new Error("Заполните модель и номер!");
             }
 
-            btn.innerText = "Отправка...";
+            const requestData = {
+                user_id: user.id,
+                type: 'Авто',
+                content: 'Модель: ' + model + ' | Номер: ' + plate + ' | Цвет: ' + color,
+                status: 'pending'
+            };
 
             const { error: dbError } = await supabaseClient
                 .from('requests')
-                .insert([{ 
-                    user_id: user.id, 
-                    type: 'Авто', 
-                    content: Модель: ${model} | Номер: ${plate} | Цвет: ${color},
-                    status: 'pending' 
-                }]);
+                .insert([requestData]);
 
             if (dbError) throw dbError;
 
