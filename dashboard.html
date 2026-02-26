@@ -71,7 +71,7 @@
     const SUPABASE_KEY = 'sb_publishable_hqkja0dR9Kr4amSmucpHrA_VqeIaMRv';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    async function checkUser() {
+  async function checkUser() {
         const { data: { user } } = await supabaseClient.auth.getUser();
         if (!user) {
             window.location.href = "index.html";
@@ -80,10 +80,15 @@
         }
     }
 
-    // Эта функция будет перенаправлять на формы (которые мы создадим чуть позже)
+    // ВОТ ТУТ МЫ МЕНЯЕМ:
     function openService(type) {
-        alert("Вы выбрали: " + type + ". Сейчас мы создадим форму для этого!");
-        // В будущем тут будет: window.location.href = "form.html?type=" + type;
+        if (type === 'Регистрация авто') {
+            window.location.href = "auto.html";
+        } else if (type === 'Гражданство') {
+            window.location.href = "passport.html"; // Это сделаем следующим шагом
+        } else {
+            alert("Этот раздел (" + type + ") еще в разработке!");
+        }
     }
 
     async function logout() {
@@ -93,5 +98,3 @@
 
     checkUser();
 </script>
-</body>
-</html>
