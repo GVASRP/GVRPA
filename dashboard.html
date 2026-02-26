@@ -81,13 +81,16 @@
     }
 
     // ВОТ ТУТ МЫ МЕНЯЕМ:
-    function openService(type) {
+   function openService(type) {
         if (type === 'Регистрация авто') {
             window.location.href = "auto.html";
         } 
         else if (type === 'Гражданство') {
             window.location.href = "passport.html";
         } 
+        else if (type === 'Недвижимость') { // ДОБАВИЛИ ЭТО
+            window.location.href = "house.html";
+        }
         else {
             alert("Этот раздел еще в разработке!");
         }
