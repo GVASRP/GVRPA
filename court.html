@@ -33,47 +33,37 @@
     const supabaseClient = supabase.createClient(S_URL, S_KEY);
 
     async function submitCourt() {
-        // Получаем значения
         const p = document.getElementById('plaintiff').value;
         const d = document.getElementById('defendant').value;
         const r = document.getElementById('reason').value;
 
-        // Самая простая проверка без символов "!" и "||"
-        if (p == ""  d == ""  r == "") {
-            alert("Пожалуйста, заполните все поля!");
+        // ИСПРАВЛЕНО: Теперь тут стоят правильные знаки || (ИЛИ)
+        if (!p  !d  !r) {
+            alert("Заполните все поля!");
             return;
         }
 
         try {
-            const userRes = await supabaseClient.auth.getUser();
-            const user = userRes.data.user;
-            
+            const { data: { user } } = await supabaseClient.auth.getUser();
             if (!user) {
-                alert("Ошибка: Вы не авторизованы!");
+                alert("Ошибка авторизации!");
                 return;
             }
 
-            // Склеиваем текст через плюсики (самый надежный метод)
-            const fullContent = "Истец: " + p + " | Ответчик: " + d + " | Суть: " + r;
+            // ИСПРАВЛЕНО: Текст обернут в обратные кавычки   (клавиша Ё)
+            const { error } = await supabaseClient.from('requests').insert([{
+                user_id: user.id,
+                type: 'Суд',
+                content: Истец: ${p} | Ответчик: ${d} | Суть: ${r},
+                status: 'pending'
+            }]);
 
-            const dbRes = await supabaseClient.from('requests').insert([
-                {
-                    user_id: user.id,
-                    type: 'Суд',
-                    content: fullContent,
-                    status: 'pending'
-                }
-            ]);
+            if (error) throw error;
 
-            if (dbRes.error) {
-                alert("Ошибка базы: " + dbRes.error.message);
-            } else {
-                alert("Иск успешно подан!");
-                window.location.href = "dashboard.html";
-            }
-
+            alert("Иск подан!");
+            window.location.href = "dashboard.html";
         } catch (err) {
-            alert("Произошла ошибка: " + err.message);
+            alert("Ошибка: " + err.message);
         }
     }
 </script>
