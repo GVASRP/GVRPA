@@ -1,68 +1,49 @@
-/* --- ОСНОВНЫЕ НАСТРОЙКИ --- */
+/* --- БАЗОВЫЕ СТИЛИ (КАК БЫЛО) --- */
 :root {
     --bg: #0a0a0a;
     --card-bg: #141414;
+    --accent: #8b5cf6; /* Фиолетовый */
     --text: #ffffff;
     --text-dim: #a0a0a0;
-    --accent: #8b5cf6;
     --border: #262626;
     --danger: #ef4444;
-}
-
-* {
-    box-sizing: border-box;
 }
 
 body {
     background-color: var(--bg);
     color: var(--text);
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
-    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Центрируем всё */
 }
 
-/* --- НАВИГАЦИЯ (ИСПРАВЛЕННАЯ) --- */
+/* --- НАВИГАЦИЯ --- */
 .navbar {
+    width: 100%;
     display: flex;
-    justify-content: space-between; /* Лого слева, профиль справа */
+    justify-content: space-between;
     align-items: center;
-    padding: 15px 30px;
+    padding: 20px 50px;
     background: var(--card-bg);
     border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
 }
 
 .nav-logo {
-    font-size: 22px !important; /* Фиксированный размер */
+    font-size: 24px;
     font-weight: bold;
-    flex-shrink: 0; /* Запрещаем сжиматься */
     color: var(--text);
 }
 
 .nav-user {
     display: flex;
     align-items: center;
-    gap: 15px; /* Расстояние между элементами */
+    gap: 15px;
 }
 
-/* Контейнер для ссылки админа и кнопки заявок */
-.nav-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-#user-display {
-    color: var(--text-dim);
-    font-weight: 500;
-}
-
-/* --- КНОПКИ И ССЫЛКИ --- */
-
-/* Кнопка Мои заявки */
+/* --- КНОПКИ (НОВОВВЕДЕНИЯ) --- */
 .btn-profile {
     background: var(--accent);
     color: white;
@@ -70,100 +51,115 @@ body {
     padding: 8px 16px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 13px;
     font-weight: 600;
-    white-space: nowrap;
-    transition: 0.3s ease;
+    transition: 0.3s;
 }
 
 .btn-profile:hover {
-    filter: brightness(1.2);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(139, 92, 246, 0.3);
 }
 
-/* Ссылка на админку (Панель) */
-#admin-link {
-    color: var(--danger);
-    font-size: 13px;
-    text-decoration: none;
-    border: 1px solid var(--danger);
-    padding: 6px 12px;
-    border-radius: 8px;
-    transition: 0.3s;
-    font-weight: 600;
-}
-
-#admin-link:hover {
-    background: rgba(239, 68, 68, 0.1);
-}
-
-/* Кнопка Выход */
 .btn-exit {
-    background: transparent;
-    color: var(--text-dim);
-    border: 1px solid var(--border);
+    background: #333;
+    color: #eee;
+    border: none;
     padding: 8px 16px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 13px;
-    transition: 0.3s;
 }
 
 .btn-exit:hover {
     background: var(--danger);
-    color: white;
-    border-color: var(--danger);
 }
 
-/* --- СЕТКА КАРТОЧЕК (ГЛАВНАЯ) --- */
+/* --- СЕТКА КАРТОЧЕК (ЦЕНТРИРОВАННАЯ) --- */
 .container {
+    width: 100%;
     max-width: 1200px;
-    margin: 40px auto;
-    padding: 0 20px;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
 }
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
+    width: 100%;
+    justify-items: center; /* Центрируем карточки внутри сетки */
 }
 
 .card {
     background: var(--card-bg);
     border: 1px solid var(--border);
-    padding: 35px 20px;
+    padding: 30px;
     border-radius: 20px;
     text-align: center;
     cursor: pointer;
-    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: 0.3s;
+    width: 100%;
+    max-width: 250px;
 }
 
 .card:hover {
     border-color: var(--accent);
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .icon {
-    font-size: 45px;
+    font-size: 40px;
     display: block;
+    margin-bottom: 10px;
+}
+
+/* --- АВТОРИЗАЦИЯ --- */
+#auth-screen {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-card {
+    background: var(--card-bg);
+    padding: 40px;
+    border-radius: 25px;
+    border: 1px solid var(--border);
+    text-align: center;
+    width: 350px;
+}
+
+h1 { color: var(--accent); margin-bottom: 5px; }
+.subtitle { color: var(--text-dim); margin-bottom: 30px; font-size: 14px; }
+
+input {
+    width: 100%;
+    padding: 12px;
     margin-bottom: 15px;
+    background: #000;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: white;
+    outline: none;
 }
 
-.card h3 {
-    margin: 0;
-    font-size: 17px;
-    font-weight: 600;
+input:focus { border-color: var(--accent); }
+
+.btn-main {
+    width: 100%;
+    padding: 12px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
 }
 
-/* --- ДОПОЛНИТЕЛЬНО --- */
-.subtitle {
-    color: var(--text-dim);
-    text-align: center;
-    margin-bottom: 30px;
-}
+.link { color: var(--accent); cursor: pointer; text-decoration: underline; }
 
-h1 {
-    text-align: center;
-    margin-top: 40px;
+/* --- МОДАЛКА УВЕДОМЛЕНИЙ --- */
+#tg-modal .auth-card {
+    border: 1px solid #24A1DE;
 }
