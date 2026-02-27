@@ -1,1 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация Брака | КальтУслуги</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body style="display: block; padding: 40px 20px;">
 
+    <div class="auth-card" style="max-width: 600px; margin: 0 auto;">
+        <h1>💍 РЕГИСТРАЦИЯ БРАКА</h1>
+        <p class="subtitle">Официальное заключение союза в штате GVRPA</p>
+
+        <div id="marriage-form" style="text-align: left;">
+            <h3 style="color: var(--accent-purple); border-bottom: 1px solid rgba(139, 92, 246, 0.3); padding-bottom: 5px;">Супруги</h3>
+            
+            <label>1. Ник в Roblox и юз в телеграмме (Супруг №1):</label>
+            <input type="text" id="m-partner1" placeholder="Nick_Name первого">
+
+            <label>2. Ник в Roblox и юз в телеграмме (Супруг №2):</label>
+            <input type="text" id="m-partner2" placeholder="Nick_Name второго">
+
+            <h3 style="margin-top: 25px; color: var(--accent-purple); border-bottom: 1px solid rgba(139, 92, 246, 0.3); padding-bottom: 5px;">Детали союза</h3>
+
+            <label>3. Общая фамилия после брака:</label>
+            <input type="text" id="m-surname" placeholder="Какую фамилию оставляете?">
+
+            <label>4. Дата и время церемонии:</label>
+            <input type="text" id="m-date" placeholder="ДД.ММ.ГГГГ | ЧЧ:ММ">
+
+            <label>5. Ник свидетеля (если был):</label>
+            <input type="text" id="m-witness" placeholder="Nick_Name свидетеля">
+
+            <label>6. Фото/Скриншот с церемонии (ссылка):</label>
+            <input type="text" id="m-proof" placeholder="https://imgur.com/...">
+
+            <label>7. Место проведения (Церковь/Мэрия/Природа):</label>
+            <input type="text" id="m-loc" placeholder="Например: Центральная церковь">
+
+            <button onclick="sendMarriageApp()" class="btn-main" style="margin-top: 20px;">Подать заявление о браке</button>
+            <button onclick="location.href='../index.html'" class="btn-exit" style="width: 100%; margin-top: 10px; border: none;">Отмена</button>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function sendMarriageApp() {
+            const user = JSON.parse(localStorage.getItem('gvr_user'));
+            if(!user) return alert("Вы не вошли!");
+
+            const formData = {
+                partner_1: document.getElementById('m-partner1').value,
+                partner_2: document.getElementById('m-partner2').value,
+                new_surname: document.getElementById('m-surname').value,
+                wedding_date: document.getElementById('m-date').value,
+                witness: document.getElementById('m-witness').value,
+                evidence: document.getElementById('m-proof').value,
+                location: document.getElementById('m-loc').value
+            };
+
+            if(!formData.partner_1  !formData.partner_2  !formData.new_surname) {
+                return alert("Пожалуйста, укажите ники обоих супругов и будущую фамилию!");
+            }
+
+            const { error } = await supabaseClient
+                .from('applications')
+                .insert([{ 
+                    username: user.username, 
+                    type: 'marriage', 
+                    data: formData, 
+                    status: 'pending' 
+                }]);
+
+            if (error) alert("Ошибка: " + error.message);
+            else {
+                alert("Поздравляем! Заявление на регистрацию брака отправлено в ЗАГС.");
+                window.location.href = '../index.html';
+            }
+        }
+    </script>
+</body>
+</html>
