@@ -2,82 +2,59 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>КальтУслуги | GVRPA</title>
-    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div id="auth-container">
-        <h1>🏛 КАЛЬТУСЛУГИ</h1>
-        
-        <div id="login-form">
-            <h2>Вход</h2>
-            <input type="email" id="email" placeholder="Email">
-            <input type="password" id="password" placeholder="Пароль">
-            <button onclick="signIn()">Войти</button>
-            <p>Нет аккаунта? <a href="#" onclick="toggleAuth()">Зарегистрироваться</a></p>
-        </div>
+    <div id="auth-screen">
+        <div class="auth-card">
+            <h1>🏛 КАЛЬТУСЛУГИ</h1>
+            <p class="subtitle">Портал государственных услуг GVRPA</p>
+            
+            <div id="login-box">
+                <input type="text" id="login-nick" placeholder="Ник в Roblox">
+                <input type="password" id="login-pass" placeholder="Пароль">
+                <button onclick="login()" class="btn-main">Войти</button>
+                <p>Нет аккаунта? <span class="link" onclick="showReg(true)">Регистрация</span></p>
+            </div>
 
-        <div id="register-form" style="display: none;">
-            <h2>Регистрация</h2>
-            <input type="text" id="reg-nickname" placeholder="Ник в игре (Roblox)">
-            <input type="text" id="reg-tg" placeholder="@ Телеграм">
-            <input type="email" id="reg-email" placeholder="Email">
-            <input type="password" id="reg-password" placeholder="Пароль">
-            <button onclick="signUp()">Создать аккаунт</button>
-            <p>Уже есть аккаунт? <a href="#" onclick="toggleAuth()">Войти</a></p>
+            <div id="reg-box" style="display: none;">
+                <input type="text" id="reg-nick" placeholder="Ник в Roblox">
+                <input type="text" id="reg-tg" placeholder="Ваш @Telegram">
+                <input type="password" id="reg-pass" placeholder="Придумайте пароль">
+                <button onclick="register()" class="btn-main">Создать аккаунт</button>
+                <p>Уже есть аккаунт? <span class="link" onclick="showReg(false)">Войти</span></p>
+            </div>
         </div>
     </div>
 
-    <div id="main-content" style="display: none;">
-        <header>
-            <span>🏛 КальтУслуги</span>
-            <button onclick="signOut()">Выйти</button>
-        </header>
-        
-   <div class="grid">
-    <div class="card" onclick="openForm('car')">
-        <span class="icon">🚗</span>
-        <h3>Регистрация авто</h3>
+    <div id="main-screen" style="display: none;">
+        <nav class="navbar">
+            <div class="nav-logo">🏛 КальтУслуги</div>
+            <div class="nav-user">
+                <span id="user-display">Загрузка...</span>
+                <button onclick="logout()" class="btn-exit">Выход</button>
+            </div>
+        </nav>
+
+        <div class="grid">
+            <div class="card" onclick="openForm('car')"><span class="icon">🚗</span><h3>Регистрация авто</h3></div>
+            <div class="card" onclick="openForm('id')"><span class="icon">🪪</span><h3>ID-карта</h3></div>
+            <div class="card" onclick="openForm('license')"><span class="icon">💳</span><h3>Вод. права</h3></div>
+            <div class="card" onclick="openForm('house')"><span class="icon">🏠</span><h3>Регистрация дома</h3></div>
+            <div class="card" onclick="openForm('accident')"><span class="icon">💥</span><h3>Регистрация ДТП</h3></div>
+            <div class="card" onclick="openForm('court')"><span class="icon">⚖️</span><h3>Подать в суд</h3></div>
+            <div class="card" onclick="openForm('marriage')"><span class="icon">💍</span><h3>ЗАГС</h3></div>
+            <div class="card" onclick="openForm('realty')"><span class="icon">🏗</span><h3>Недвижимость</h3></div>
+            <div class="card" onclick="openForm('rules')"><span class="icon">📜</span><h3>Правила</h3></div>
+            <div id="police-tile" class="card police-only" style="display: none;" onclick="location.href='admin.html'">
+                <span class="icon">🚔</span><h3>База данных</h3>
+            </div>
+        </div>
     </div>
-    <div class="card" onclick="openForm('id')">
-        <span class="icon">🪪</span>
-        <h3>ID-карта</h3>
-    </div>
-    <div class="card" onclick="openForm('license')">
-        <span class="icon">💳</span>
-        <h3>Вод. права</h3>
-    </div>
-    <div class="card" onclick="openForm('house')">
-        <span class="icon">🏠</span>
-        <h3>Регистрация дома</h3>
-    </div>
-    <div class="card" onclick="openForm('accident')">
-        <span class="icon">💥</span>
-        <h3>Регистрация ДТП</h3>
-    </div>
-    <div class="card" onclick="openForm('court')">
-        <span class="icon">⚖️</span>
-        <h3>Подать в суд</h3>
-    </div>
-    <div class="card" onclick="openForm('marriage')">
-        <span class="icon">💍</span>
-        <h3>ЗАГС</h3>
-    </div>
-    <div class="card" onclick="openForm('realty')">
-        <span class="icon">🏗</span>
-        <h3>Недвижимость</h3>
-    </div>
-    <div class="card" onclick="openForm('rules')">
-        <span class="icon">📜</span>
-        <h3>Правила проекта</h3>
-    </div>
-    <div id="police-tile" class="card police-only" style="display: none;" onclick="location.href='admin.html'">
-        <span class="icon">🚔</span>
-        <h3>База данных</h3>
-    </div>
-</div>
 
     <script src="script.js"></script>
 </body>
