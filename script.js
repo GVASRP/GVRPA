@@ -82,3 +82,22 @@ window.onload = () => {
     const saved = localStorage.getItem('gvr_user');
     if (saved) renderMain(JSON.parse(saved));
 };;
+// Функция для привязки Телеграм-бота
+function linkTelegram() {
+    const userData = JSON.parse(localStorage.getItem('gvr_user'));
+    
+    if (!userData || !userData.username) {
+        alert("Пожалуйста, сначала войдите в свой аккаунт!");
+        return;
+    }
+
+    // Впиши сюда ник своего бота БЕЗ символа @
+    // Например: const botUsername = 'GvrpaPortalBot';
+    const botUsername = 'ТВОЙ_БОТ_USERNAME'; 
+    const robloxNick = userData.username;
+
+    // Формируем ссылку для передачи ника боту
+    const link = https://t.me/${botUsername}?start=${robloxNick};
+    
+    window.open(link, '_blank');
+}
