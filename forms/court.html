@@ -1,1 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Судебный Иск | КальтУслуги</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body style="display: block; padding: 40px 20px;">
 
+    <div class="auth-card" style="max-width: 700px; margin: 0 auto;">
+        <h1>⚖️ СУДЕБНЫЙ ИСК</h1>
+        <p class="subtitle">Подача официального заявления в Верховный Суд GVRPA</p>
+
+        <div id="court-form" style="text-align: left;">
+            <h3 style="color: var(--accent-purple); border-bottom: 1px solid rgba(139, 92, 246, 0.3); padding-bottom: 5px;">Стороны процесса</h3>
+            
+            <label>1. Истец (Ваше ФИО и Ник в Roblox, а так же @ в телеграмм):</label>
+            <input type="text" id="court-plaintiff" placeholder="Иван Иванов | Nick_Name">
+
+            <label>2. Ответчик (Ник того, на кого подаете):</label>
+            <input type="text" id="court-defendant" placeholder="Nick_Name ответчика">
+
+            <h3 style="margin-top: 25px; color: var(--accent-purple); border-bottom: 1px solid rgba(139, 92, 246, 0.3); padding-bottom: 5px;">Суть обращения</h3>
+
+            <label>3. Нарушенные статьи (если известны):</label>
+            <input type="text" id="court-law" placeholder="Например: 1.2 УК, 4.5 КоАП">
+
+            <label>4. Описание ситуации (Расскажите подробно, что произошло):</label>
+            <textarea id="court-reason" rows="6" placeholder="Число, время, действия ответчика..."></textarea>
+
+            <label>5. Ваши требования (Чего вы хотите добиться?):</label>
+            <textarea id="court-demands" rows="3" placeholder="Выплата компенсации, арест, увольнение..."></textarea>
+
+            <label>6. Доказательства (Ссылки на видео, скрины):</label>
+            <textarea id="court-evidence" rows="2" placeholder="https://youtube.com/... или https://imgur.com/..."></textarea>
+
+            <label>7. Имеются ли свидетели? (Укажите ники):</label>
+            <input type="text" id="court-witnesses" placeholder="Nick_Name свидетелей через запятую">
+
+            <button onclick="sendCourtApp()" class="btn-main" style="margin-top: 20px;">Подать иск в суд</button>
+            <button onclick="location.href='../index.html'" class="btn-exit" style="width: 100%; margin-top: 10px; border: none;">Отозвать иск</button>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function sendCourtApp() {
+            const user = JSON.parse(localStorage.getItem('gvr_user'));
+            if(!user) return alert("Вы не вошли!");
+
+            const formData = {
+                plaintiff: document.getElementById('court-plaintiff').value,
+                defendant: document.getElementById('court-defendant').value,
+                violated_laws: document.getElementById('court-law').value,
+                situation: document.getElementById('court-reason').value,
+                demands: document.getElementById('court-demands').value,
+                evidence: document.getElementById('court-evidence').value,
+                witnesses: document.getElementById('court-witnesses').value
+            };
+
+            if(!formData.plaintiff  !formData.defendant  !formData.situation || !formData.evidence) {
+                return alert("Иск отклонен: Не заполнены обязательные поля (Истец, Ответчик, Суть, Улики)!");
+            }
+
+            const { error } = await supabaseClient
+                .from('applications')
+                .insert([{ 
+                    username: user.username, 
+                    type: 'court', 
+                    data: formData, 
+                    status: 'pending' 
+                }]);
+]
+if (error) alert("Ошибка: " + error.message);
+            else {
+                alert("Исковое заявление №" + Math.floor(Math.random() * 1000) + " успешно подано и ожидает рассмотрения Судьёй!");
+                window.location.href = '../index.html';
+            }
+        }
+    </script>
+</body>
+</html>
