@@ -8,27 +8,30 @@
     <link rel="stylesheet" href="../style.css">
 </head>
 <body class="auth-page">
-    <div id="auth-screen" style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #000;">
-        <div class="auth-card" style="background: #111; padding: 30px; border-radius: 15px; border: 1px solid #333; width: 100%; max-width: 400px; text-align: center; color: white;">
+    <div id="auth-screen" style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+        <div class="auth-card">
             <h1>🚗 РЕГИСТРАЦИЯ ТС</h1>
-            <p class="subtitle" style="color: #888;">Заполните данные о вашем авто</p>
+            <p class="subtitle">Заполните данные о вашем транспортном средстве</p>
 
             <div id="login-box">
-                <input type="text" id="car-brand" placeholder="1. Марка Т/С" style="width: 100%; margin: 10px 0; padding: 12px; background: #000; border: 1px solid #333; color: white; border-radius: 8px;">
-                <input type="text" id="car-model" placeholder="2. Модель" style="width: 100%; margin: 10px 0; padding: 12px; background: #000; border: 1px solid #333; color: white; border-radius: 8px;">
-                <input type="number" id="car-year" placeholder="3. Год выпуска" style="width: 100%; margin: 10px 0; padding: 12px; background: #000; border: 1px solid #333; color: white; border-radius: 8px;">
-                <input type="text" id="car-plate" placeholder="4. Регистрационный номер" style="width: 100%; margin: 10px 0; padding: 12px; background: #000; border: 1px solid #333; color: white; border-radius: 8px;">
+                <input type="text" id="car-brand" placeholder="1. Марка Т/С">
+                <input type="text" id="car-model" placeholder="2. Модель">
+                <input type="number" id="car-year" placeholder="3. Год выпуска">
+                <input type="text" id="car-plate" placeholder="4. Регистрационный номер">
                 
                 <p style="text-align: left; font-size: 13px; margin-top: 15px; color: #aaa;">5. Фото авто (ссылки):</p>
-                <textarea id="car-photos" placeholder="https://imgur.com/..." style="width: 100%; background: #000; color: #fff; border: 1px solid #333; border-radius: 8px; padding: 12px; margin-bottom: 10px; min-height: 80px;"></textarea>
+                <textarea id="car-photos" placeholder="https://imgur.com/..." style="width: 100%; background: #000; color: #fff; border: 1px solid #333; border-radius: 5px; padding: 10px; margin-bottom: 10px;"></textarea>
                 
-                <button onclick="sendCarApplication()" class="btn-main" style="width: 100%; padding: 12px; background: #fff; color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">Подать заявку</button>
-                <button onclick="location.href='../index.html'" class="btn-exit" style="width: 100%; margin-top: 10px; background: transparent; color: #666; border: none; cursor: pointer;">Отмена</button>
+                <button onclick="sendCarApplication()" class="btn-main">Подать заявку</button>
+                <button onclick="location.href='../index.html'" class="btn-exit" style="width: 100%; margin-top: 10px;">Отмена</button>
             </div>
         </div>
     </div>
 
     <script>
+        // Проверяем, что скрипт вообще загрузился
+        console.log("Script car.html loaded");
+
         const SUPABASE_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -45,14 +48,13 @@
                 const plate = document.getElementById('car-plate').value;
                 const photos = document.getElementById('car-photos').value;
 
-                // ВОТ ТУТ БЫЛА ОШИБКА (Исправлено на ||)
+                // ИСПРАВЛЕНО: Теперь тут стоят правильные ||
                 if(!brand  !model  !plate) {
-                    return alert("Пожалуйста, заполните марку, модель и номер!");
+                    return alert("Заполните основные поля (Марка, Модель, Номер)!");
                 }
 
                 const { error } = await supabaseClient
-
-.from('applications')
+                    .from('applications')
                     .insert([{ 
                         username: user.username, 
                         type: 'car', 
@@ -62,12 +64,12 @@
 
                 if (error) throw error;
 
-                alert("Заявка успешно подана!");
+                alert("Заявка подана успешно!");
                 window.location.href = '../index.html';
 
-            } catch (err) {
-                console.error("Ошибка выполнения:", err);
-                alert("Произошла ошибка: " + err.message);
+            } catch (e) {
+                console.error("Ошибка:", e);
+                alert("Ошибка: " + e.message);
             }
         }
     </script>
