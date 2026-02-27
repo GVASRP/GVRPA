@@ -63,10 +63,9 @@ function openForm(type) {
     if (type === 'police') {
         window.location.href = 'police.html';
     } else {
-        window.location.href = forms/${type}.html;
+        window.location.href = 'forms/' + type + '.html';
     }
 }
-
 
 async function sendApp(type, info) {
     const user = JSON.parse(localStorage.getItem('gvr_user'));
@@ -81,41 +80,26 @@ async function sendApp(type, info) {
 window.onload = () => {
     const saved = localStorage.getItem('gvr_user');
     if (saved) renderMain(JSON.parse(saved));
-};;
-// Функция для привязки Телеграм-бота
-function linkTelegram() {
-    const userData = JSON.parse(localStorage.getItem('gvr_user'));
-    
-    if (!userData || !userData.username) {
-        alert("Пожалуйста, сначала войдите в свой аккаунт!");
-        return;
-    }
+};
 
-    // Впиши сюда ник своего бота БЕЗ символа @
-    // Например: const botUsername = 'GvrpaPortalBot';
-    const botUsername = 'ТВОЙ_БОТ_USERNAME'; 
-    const robloxNick = userData.username;
+// --- ФУНКЦИИ ТЕЛЕГРАМА ---
 
-    // Формируем ссылку для передачи ника боту
-    const link = https://t.me/${botUsername}?start=${robloxNick};
-    
-    window.open(link, '_blank');
-}
-// Функция открытия окна
 function linkTelegram() {
     document.getElementById('tg-modal').style.display = 'flex';
 }
 
-// Функция сохранения ID в базу
 async function saveTgId() {
     const tgId = document.getElementById('tg-id-input').value.trim();
-    // Берем ник текущего пользователя из того же места, где ты его хранишь при логине
-    // Если у тебя ник хранится в переменной или localStorage:
-    const robloxNick = localStorage.getItem('userNick'); // Или как у тебя в коде реализовано получение ника
+    const savedData = localStorage.getItem('gvr_user');
+    
+    if (!savedData) return alert("Сначала войдите в аккаунт!");
+    
+    const user = JSON.parse(savedData);
+    const robloxNick = user.username;
 
     if (!tgId) return alert("Введите ID!");
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('telegram_users')
         .upsert([{ 
             username: robloxNick, 
