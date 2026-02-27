@@ -60,9 +60,10 @@ function logout() {
 }
 
 function openForm(type) {
-    const info = prompt("Введите данные для регистрации (Ник, детали, ссылки на скрины):");
-    if (info) sendApp(type, info);
+    // Переход в папку forms к нужному файлу
+    window.location.href = forms/${type}.html;
 }
+
 
 async function sendApp(type, info) {
     const user = JSON.parse(localStorage.getItem('gvr_user'));
