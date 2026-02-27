@@ -23,12 +23,11 @@
             <p style="color: #888;">Введите данные вашего автомобиля</p>
 
             <div id="login-box">
-                <input type="text" id="car-brand" placeholder="Марка (Например: Toyota)">
-                <input type="text" id="car-model" placeholder="Модель (Например: Camry)">
+                <input type="text" id="car-brand" placeholder="Марка">
+                <input type="text" id="car-model" placeholder="Модель">
                 <input type="number" id="car-year" placeholder="Год выпуска">
                 <input type="text" id="car-plate" placeholder="Гос. номер">
-                
-                <textarea id="car-photos" placeholder="Ссылка на фото (Imgur/Discord)"></textarea>
+                <textarea id="car-photos" placeholder="Ссылки на фото"></textarea>
                 
                 <button onclick="sendCarApplication()" class="btn-main">Отправить заявку</button>
                 <button onclick="location.href='../index.html'" class="btn-exit">Назад</button>
@@ -37,37 +36,35 @@
     </div>
 
     <script>
-        // Данные подключения
         const SUPABASE_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         async function sendCarApplication() {
-            console.log("Кнопка нажата, функция запущена"); // Проверка в консоли
+            // Очищаем консоль для чистого теста
+            console.clear();
+            console.log("Функция вызвана!");
 
             try {
-                // 1. Проверяем авторизацию
                 const userData = localStorage.getItem('gvr_user');
                 if (!userData) {
-                    alert("Ошибка: Вы не вошли в систему!");
+                    alert("Сначала войдите в систему!");
                     return;
                 }
                 const user = JSON.parse(userData);
 
-                // 2. Собираем данные из полей
-                const brand = document.getElementById('car-brand').value.trim();
-                const model = document.getElementById('car-model').value.trim();
-                const year = document.getElementById('car-year').value.trim();
-                const plate = document.getElementById('car-plate').value.trim();
-                const photos = document.getElementById('car-photos').value.trim();
+                const brand = document.getElementById('car-brand').value;
+                const model = document.getElementById('car-model').value;
+                const year = document.getElementById('car-year').value;
+                const plate = document.getElementById('car-plate').value;
+                const photos = document.getElementById('car-photos').value;
 
-                // 3. Проверка на пустые поля (обязательно через ||)
+                // ИСПРАВЛЕННЫЙ СИНТАКСИС (используем ||)
                 if (!brand  !model  !plate) {
-                    alert("Заполните марку, модель и гос. номер!");
+                    alert("Заполните марку, модель и номер!");
                     return;
                 }
 
-                // 4. Отправка в Supabase
                 const { error } = await supabaseClient
                     .from('applications')
                     .insert([{ 
@@ -79,11 +76,11 @@
 
                 if (error) throw error;
 
-alert("✅ Заявка успешно отправлена!");
+                alert("Заявка успешно отправлена!");
                 window.location.href = '../index.html';
 
-            } catch (err) {
-                console.error("Ошибка Supabase:", err);
+} catch (err) {
+                console.error("Ошибка:", err);
                 alert("Произошла ошибка: " + err.message);
             }
         }
