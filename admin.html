@@ -114,19 +114,84 @@
             });
         }
 
-        async function updateStatus(id, newStatus) {
-            const { error } = await supabaseClient
+       async function updateStatus(id, newStatus) {
+            // 1. Если статус "rejected" (отклонено), просто меняем статус и выходим
+            if (newStatus === 'rejected') {
+                const { error } = await supabaseClient
+                    .from('applications')
+                    .update({ status: 'rejected' })
+                    .eq('id', id);
+                if (error) alert("Ошибка: " + error.message);
+                else { alert("Отклонено!"); loadApps(); }
+                return;
+            }
+
+            // 2. Если статус "approved" (одобрено), начинаем магию переноса
+            // Сначала достаем всю инфу о заявке по её ID
+            const { data: app, error: fetchError } = await supabaseClient
                 .from('applications')
-                .update({ status: newStatus })
-                .eq('id', id);
-            
-            if (error) {
-                alert("Ошибка: " + error.message);
-            } else {
-                alert(newStatus === 'approved' ? "Одобрено!" : "Отклонено!");
+                .select('*')
+                .eq('id', id)
+                .single();
+
+            if (fetchError || !app) {
+                alert("Не удалось получить данные заявки");
+                return;
+            }
+
+            try {
+                // ПЕРЕНОС В БАЗУ ГРАЖДАН (CITIZENS)
+                if (app.type === 'id') {
+                    // Для ID-карты берем ФИО из данных заявки
+                    const fullName = app.data['ФИО'] || app.data['Имя'] || "Не указано";
+                    await supabaseClient.from('citizens').upsert({ 
+                        roblox_nick: app.username, 
+                        full_name: fullName 
+                    }, { onConflict: 'roblox_nick' });
+                } 
+                
+                else if (app.type === 'car') {
+                    // Для авто склеиваем марку и номер
+                    const carInfo = `${app.data['Марка']} [${app.data['Номер'] || 'Б/Н'}]`;
+                    
+                    // Сначала проверяем, есть ли уже машины у игрока
+                    let { data: citizen } = await supabaseClient.from('citizens').select('car_data').eq('roblox_nick', app.username).single();
+                    let oldCars = (citizen?.car_data && citizen.car_data !== 'Нет транспорта') ? citizen.car_data : "";
+                    let updatedCars = oldCars ? oldCars + ", " + carInfo : carInfo;
+
+                    await supabaseClient.from('citizens').upsert({ 
+                        roblox_nick: app.username, 
+                        car_data: updatedCars 
+                    }, { onConflict: 'roblox_nick' });
+                }
+
+                else if (app.type === 'house') {
+                    const address = app.data['Адрес'] || app.data['Номер дома'];
+                    await supabaseClient.from('citizens').upsert({ 
+                        roblox_nick: app.username, 
+                        address: address 
+                    }, { onConflict: 'roblox_nick' });
+                }
+
+                else if (app.type === 'marriage') {
+                    const spouseNick = app.data['Ник супруга'] || app.data['Супруг'];
+                    // Обновляем обоих
+                    await supabaseClient.from('citizens').upsert({ roblox_nick: app.username, spouse: spouseNick }, { onConflict: 'roblox_nick' });
+                    await supabaseClient.from('citizens').upsert({ roblox_nick: spouseNick, spouse: app.username }, { onConflict: 'roblox_nick' });
+                }
+
+                // 3. После того как данные улетели в базу МВД, меняем статус заявки на Одобрено
+                await supabaseClient.from('applications').update({ status: 'approved' }).eq('id', id);
+
+                alert("Одобрено и внесено в базу!");
                 loadApps();
+
+            } catch (err) {
+                console.error("Ошибка системы:", err);
+                alert("Ошибка при записи в базу данных!");
             }
         }
+
 
         // Сначала проверяем права, потом грузим список
         window.onload = () => {
