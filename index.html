@@ -34,15 +34,17 @@
     <div id="main-screen" style="display: none;">
         <nav class="navbar">
             <div class="nav-logo">🏛 КальтУслуги</div>
+            
             <div class="nav-user">
-    <span id="user-display">Загрузка...</span>
-    
-    <div id="nav-controls" style="display: inline-flex; gap: 8px; margin: 0 15px;">
-        <button onclick="location.href='profile.html'" class="btn-nav-small">📂 Мои заявки</button>
-        </div>
+                <span id="user-display">Загрузка...</span>
+                
+                <div class="nav-actions">
+                    <a id="admin-link" href="admin.html" style="display: none;">Панель</a>
+                    
+                    <button onclick="location.href='profile.html'" class="btn-profile">📂 Мои заявки</button>
+                </div>
 
-    <button onclick="logout()" class="btn-exit">Выход</button>
-</div>
+                <button onclick="logout()" class="btn-exit">Выход</button>
             </div>
         </nav>
 
@@ -57,23 +59,22 @@
             <div class="card" onclick="linkTelegram()" style="border-color: #24A1DE;"><span class="icon">✈️</span><h3>Telegram Уведомления</h3></div>
             <div class="card" onclick="openForm('realty')"><span class="icon">🏗</span><h3>Недвижимость</h3></div>
             <div class="card" onclick="openForm('rules')"><span class="icon">📜</span><h3>Правила</h3></div>
-            <div id="police-tile" class="card police-only" style="display: none;" onclick="location.href='admin.html'">
-                <span class="icon">🚔</span><h3>База данных</h3>
-            </div>
         </div>
     </div>
-<div id="tg-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
-    <div class="auth-card" style="position: relative; max-width: 400px;">
-        <span onclick="document.getElementById('tg-modal').style.display='none'" style="position: absolute; right: 20px; top: 10px; cursor: pointer; font-size: 24px;">&times;</span>
-        <h2>✈️ Настройка уведомлений</h2>
-        <p style="font-size: 14px; color: #ccc; margin-bottom: 15px;">
-            1. Узнайте свой ID у бота <a href="https://t.me/userinfobot" target="_blank" style="color: #24A1DE;">@userinfobot</a><br>
-            2. Введите его ниже для вашего ника.
-        </p>
-        <input type="text" id="tg-id-input" placeholder="Ваш Telegram ID (цифры)">
-        <button onclick="saveTgId()" class="btn-main">Привязать</button>
+
+    <div id="tg-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="auth-card" style="position: relative; max-width: 400px;">
+            <span onclick="document.getElementById('tg-modal').style.display='none'" style="position: absolute; right: 20px; top: 10px; cursor: pointer; font-size: 24px;">&times;</span>
+            <h2>✈️ Настройка уведомлений</h2>
+            <p style="font-size: 14px; color: #ccc; margin-bottom: 15px;">
+                1. Узнайте свой ID у бота <a href="https://t.me/userinfobot" target="_blank" style="color: #24A1DE;">@userinfobot</a><br>
+                2. Введите его ниже для вашего ника.
+            </p>
+            <input type="text" id="tg-id-input" placeholder="Ваш Telegram ID (цифры)">
+            <button onclick="saveTgId()" class="btn-main">Привязать</button>
+        </div>
     </div>
-</div>
+
     <script src="script.js"></script>
 </body>
 </html>
