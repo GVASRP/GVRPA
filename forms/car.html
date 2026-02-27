@@ -6,9 +6,17 @@
     <title>Регистрация ТС | КальтУслуги</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="../style.css">
+    <style>
+        #auth-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; background-color: #000; }
+        .auth-card { background: #111; padding: 30px; border-radius: 15px; border: 1px solid #333; width: 100%; max-width: 400px; text-align: center; color: white; }
+        input, textarea { width: 100%; margin: 10px 0; padding: 12px; background: #000; border: 1px solid #333; color: white; border-radius: 8px; box-sizing: border-box; }
+        .btn-main { width: 100%; padding: 12px; background: #fff; color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .btn-exit { background: none; border: none; color: #666; cursor: pointer; margin-top: 10px; width: 100%; }
+        .subtitle { color: #888; margin-bottom: 20px; }
+    </style>
 </head>
-<body class="auth-page">
-    <div id="auth-screen" style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+<body>
+    <div id="auth-screen">
         <div class="auth-card">
             <h1>🚗 РЕГИСТРАЦИЯ ТС</h1>
             <p class="subtitle">Заполните данные о вашем транспортном средстве</p>
@@ -20,18 +28,16 @@
                 <input type="text" id="car-plate" placeholder="4. Регистрационный номер">
                 
                 <p style="text-align: left; font-size: 13px; margin-top: 15px; color: #aaa;">5. Фото авто (ссылки):</p>
-                <textarea id="car-photos" placeholder="https://imgur.com/..." style="width: 100%; background: #000; color: #fff; border: 1px solid #333; border-radius: 5px; padding: 10px; margin-bottom: 10px;"></textarea>
+                <textarea id="car-photos" placeholder="https://imgur.com/..."></textarea>
                 
-                <button onclick="sendCarApplication()" class="btn-main">Подать заявку</button>
-                <button onclick="location.href='../index.html'" class="btn-exit" style="width: 100%; margin-top: 10px;">Отмена</button>
+                <button id="submit-btn" onclick="sendCarApplication()" class="btn-main">Подать заявку</button>
+                <button onclick="location.href='../index.html'" class="btn-exit">Отмена</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Проверяем, что скрипт вообще загрузился
-        console.log("Script car.html loaded");
-
+        // Инициализация Supabase
         const SUPABASE_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -39,7 +45,10 @@
         async function sendCarApplication() {
             try {
                 const saved = localStorage.getItem('gvr_user');
-                if(!saved) return alert("Войдите в аккаунт!");
+                if(!saved) {
+                    alert("Ошибка: Вы не вошли в аккаунт!");
+                    return;
+                }
                 const user = JSON.parse(saved);
 
                 const brand = document.getElementById('car-brand').value;
@@ -48,9 +57,10 @@
                 const plate = document.getElementById('car-plate').value;
                 const photos = document.getElementById('car-photos').value;
 
-                // ИСПРАВЛЕНО: Теперь тут стоят правильные ||
-                if(!brand  !model  !plate) {
-                    return alert("Заполните основные поля (Марка, Модель, Номер)!");
+                // Проверка полей (Используем || правильно!)
+                if (!brand  !model  !plate) {
+                    alert("Заполните обязательные поля: Марка, Модель и Номер!");
+                    return;
                 }
 
                 const { error } = await supabaseClient
@@ -64,12 +74,12 @@
 
                 if (error) throw error;
 
-                alert("Заявка подана успешно!");
+                alert("Заявка успешно подана!");
                 window.location.href = '../index.html';
 
-            } catch (e) {
-                console.error("Ошибка:", e);
-                alert("Ошибка: " + e.message);
+} catch (err) {
+                console.error("Критическая ошибка:", err);
+                alert("Произошла ошибка при отправке: " + err.message);
             }
         }
     </script>
