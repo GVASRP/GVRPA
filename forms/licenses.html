@@ -1,1 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Водительская Лицензия | КальтУслуги</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body style="display: block; padding: 40px 20px;">
 
+    <div class="auth-card" style="max-width: 600px; margin: 0 auto;">
+        <h1>💳 ВОДИТЕЛЬСКАЯ ЛИЦЕНЗИЯ</h1>
+        <p class="subtitle">Заполнение данных о прохождении экзамена</p>
+
+        <div id="license-form" style="text-align: left;">
+            <label>Имя и Фамилия (Name):</label>
+            <input type="text" id="lic-name" placeholder="Ivan Ivanov">
+
+            <label>Дата рождения (D.O.B):</label>
+            <input type="text" id="lic-dob" placeholder="ДД.ММ.ГГГГ">
+
+            <label>Ваш адрес:</label>
+            <input type="text" id="lic-address" placeholder="Город, улица, номер дома">
+
+            <label>Дата выдачи:</label>
+            <input type="text" id="lic-issue" placeholder="Число/Месяц/Год">
+
+            <label>Срок действия:</label>
+            <input type="text" id="lic-expiry" value="10 лет" readonly style="color: var(--text-dim); cursor: not-allowed;">
+
+            <label>Категория:</label>
+            <select id="lic-cat" style="width:100%; padding:12px; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:12px; margin:10px 0;">
+                <option value="A" style="background:#1a1425;">A — Траки / Большие прицепы</option>
+                <option value="B" style="background:#1a1425;" selected>B — Легковые (B+ Механика)</option>
+                <option value="C" style="background:#1a1425;">C — Траки / Средние прицепы</option>
+            </select>
+
+            <h3 style="margin-top: 25px; color: var(--accent-purple); border-bottom: 1px solid rgba(139, 92, 246, 0.3); padding-bottom: 5px;">Данные инструктора</h3>
+            
+            <label>Telegram инструктора:</label>
+            <input type="text" id="inst-tg" placeholder="@username">
+
+            <label>Ник в Roblox инструктора:</label>
+            <input type="text" id="inst-nick" placeholder="Roblox_Nick">
+
+            <label>Оценка за экзамен (по 10-бальной шкале):</label>
+            <input type="number" id="lic-score" min="1" max="10" placeholder="От 1 до 10">
+
+            <button onclick="sendLicenseApp()" class="btn-main" style="margin-top: 20px;">Подать заявку</button>
+            <button onclick="location.href='../index.html'" class="btn-exit" style="width: 100%; margin-top: 10px; border: none;">Вернуться назад</button>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function sendLicenseApp() {
+            const user = JSON.parse(localStorage.getItem('gvr_user'));
+            if(!user) return alert("Вы не вошли!");
+
+            const formData = {
+                full_name: document.getElementById('lic-name').value,
+                dob: document.getElementById('lic-dob').value,
+                address: document.getElementById('lic-address').value,
+                issue_date: document.getElementById('lic-issue').value,
+                expiry: document.getElementById('lic-expiry').value,
+                category: document.getElementById('lic-cat').value,
+                instructor_tg: document.getElementById('inst-tg').value,
+                instructor_nick: document.getElementById('inst-nick').value,
+                score: document.getElementById('lic-score').value
+            };
+
+            if(!formData.full_name  !formData.instructor_nick  !formData.score) {
+                return alert("Заполните все поля, включая данные инструктора!");
+            }
+
+const { error } = await supabaseClient
+                .from('applications')
+                .insert([{ 
+                    username: user.username, 
+                    type: 'license', 
+                    data: formData, 
+                    status: 'pending' 
+                }]);
+
+            if (error) alert("Ошибка: " + error.message);
+            else {
+                alert("Заявка на лицензию отправлена! Инструктор должен подтвердить факт сдачи.");
+                window.location.href = '../index.html';
+            }
+        }
+    </script>
+</body>
+</html>
