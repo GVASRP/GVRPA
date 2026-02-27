@@ -1,93 +1,159 @@
 :root {
-    --main-blue: #00529b;
-    --light-bg: #f4f7f9;
-    --card-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    --bg-dark: #0f0a19;
+    --card-bg: #1a1425;
+    --accent-purple: #8b5cf6;
+    --text-main: #ffffff;
+    --text-dim: #a1a1aa;
+    --glow: 0 0 20px rgba(139, 92, 246, 0.3);
 }
 
-body {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: var(--light-bg);
+body, html {
     margin: 0;
-    color: #333;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center; /* Всегда по центру по горизонтали */
+    align-items: center;     /* Всегда по центру по вертикали */
 }
 
-/* Контейнер авторизации */
-.auth-container {
+/* Общий контейнер, чтобы контент не разъезжался */
+#auth-screen, #main-screen {
+    width: 100%;
+    max-width: 1200px;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    background: linear-gradient(135deg, #00529b 0%, #003366 100%);
+    padding: 20px;
 }
 
+/* КАРТОЧКА АВТОРИЗАЦИИ */
 .auth-card {
-    background: white;
+    background: var(--card-bg);
     padding: 40px;
-    border-radius: 12px;
-    box-shadow: var(--card-shadow);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: var(--glow);
     text-align: center;
-    width: 350px;
+    width: 100%;
+    max-width: 400px;
 }
 
-h1 { color: var(--main-blue); margin-bottom: 5px; }
-.subtitle { color: #666; margin-bottom: 30px; font-size: 14px; }
+h1 {
+    font-size: 2.5rem;
+    background: linear-gradient(to right, #a78bfa, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+    letter-spacing: -1px;
+}
 
+.subtitle {
+    color: var(--text-dim);
+    margin-bottom: 30px;
+}
+
+/* ПОЛЯ ВВОДА */
 input {
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     margin: 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    box-sizing: border-box;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    transition: 0.3s;
 }
 
+input:focus {
+    outline: none;
+    border-color: var(--accent-purple);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* КНОПКИ */
 .btn-main {
     width: 100%;
-    padding: 12px;
-    background-color: var(--main-blue);
+    padding: 14px;
+    background: var(--accent-purple);
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 12px;
+    font-weight: 600;
     cursor: pointer;
-    font-weight: bold;
+    transition: 0.3s;
+    margin-top: 10px;
 }
 
-.link { color: var(--main-blue); cursor: pointer; text-decoration: underline; }
-
-/* Главный экран */
-.navbar {
-    background: var(--main-blue);
-    color: white;
-    padding: 15px 50px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.btn-main:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.6);
 }
 
+.link {
+    color: var(--accent-purple);
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+/* СЕТКА ПЛИТОК */
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 20px;
-    padding: 40px 50px;
+    width: 100%;
+    margin-top: 30px;
 }
 
 .card {
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
+    background: var(--card-bg);
+    padding: 30px 20px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
     text-align: center;
-    box-shadow: var(--card-shadow);
-    transition: transform 0.2s;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
-    border-bottom: 4px solid transparent;
 }
 
 .card:hover {
-    transform: translateY(-5px);
-    border-bottom: 4px solid var(--main-blue);
+    background: rgba(139, 92, 246, 0.1);
+    border-color: var(--accent-purple);
+    transform: scale(1.05);
 }
 
-.icon { font-size: 40px; display: block; margin-bottom: 10px; }
-.card h3 { font-size: 16px; margin: 0; color: #444; }
+.card .icon {
+    font-size: 40px;
+    display: block;
+    margin-bottom: 15px;
+    filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.4));
+}
 
-.police-only { background: #eef6ff; border: 1px dashed var(--main-blue); }
+.card h3 {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-dim);
+}
+
+/* ШАПКА */
+.navbar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.btn-exit {
+    background: rgba(255, 0, 0, 0.1);
+    color: #ff4d4d;
+    border: 1px solid rgba(255, 0, 0, 0.2);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+}
