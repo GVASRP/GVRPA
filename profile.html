@@ -1,1 +1,169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет | КальтУслуги</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --card-bg: #141414;
+            --text: #ffffff;
+            --accent: #8b5cf6;
+            --border: #262626;
+        }
 
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+
+        .app-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+
+        .app-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .pending { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid #f59e0b; }
+        .approved { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid #10b981; }
+        .rejected { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; }
+
+        .btn-back {
+            background: var(--accent);
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #666;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1 style="margin: 0;">Мой Профиль</h1>
+                <p id="user-display" style="color: var(--accent); margin: 5px 0 0 0;"></p>
+            </div>
+            <a href="index.html" class="btn-back">На главную</a>
+        </div>
+
+        <div id="my-apps-list">
+            <p>Загрузка ваших заявок...</p>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function loadProfile() {
+            const saved = localStorage.getItem('gvr_user');
+            if (!saved) {
+                window.location.href = 'index.html';
+                return;
+            }
+            const user = JSON.parse(saved);
+            document.getElementById('user-display').innerText = `@${user.username}`;
+
+            const { data, error } = await supabaseClient
+                .from('applications')
+                .select('*')
+                .eq('username', user.username) // Фильтр только по СВОИМ заявкам
+                .order('created_at', { ascending: false });
+
+            const list = document.getElementById('my-apps-list');
+            list.innerHTML = '';
+
+            if (error) {
+                list.innerHTML = `<p>Ошибка: ${error.message}</p>`;
+                return;
+            }
+
+            if (data.length === 0) {
+                list.innerHTML = '<div class="empty-state"><h3>У вас пока нет заявок</h3><p>Все поданные вами формы появятся здесь.</p></div>';
+                return;
+            }
+
+            data.forEach(app => {
+                const card = document.createElement('div');
+                card.className = 'app-card';
+
+                const statusMap = {
+                    'pending': { text: 'На рассмотрении', class: 'pending' },
+                    'approved': { text: 'Одобрено', class: 'approved' },
+                    'rejected': { text: 'Отклонено', class: 'rejected' }
+                };
+                const status = statusMap[app.status] || statusMap.pending;
+
+                card.innerHTML = `
+                    <div>
+                        <div style="font-weight: bold; font-size: 16px;">${translateType(app.type)}</div>
+                        <div style="color: #666; font-size: 13px; margin-top: 4px;">ID: ${app.id.slice(0,8)}...</div>
+                    </div>
+                    <div class="status-badge ${status.class}">${status.text}</div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function translateType(type) {
+            const types = {
+                'court': '⚖️ Судебный иск',
+                'car': '🚗 Регистрация ТС',
+                'marriage': '💍 Регистрация брака',
+                'realty': '🏗 Коммерция',
+                'accident': '🚔 ДТП'
+            };
+            return types[type] || type.toUpperCase();
+        }
+
+        window.onload = loadProfile;
+    </script>
+</body>
+  </html>
