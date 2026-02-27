@@ -6,14 +6,100 @@
     <title>Водительская Лицензия | КальтУслуги</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="../style.css">
-</head>
-<body style="display: block; padding: 40px 20px;">
+    <style>
+        /* Принудительный темный фон для всей страницы */
+        body {
+            background-color: #0a0a0a !important;
+            color: white !important;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
 
-    <div class="auth-card" style="max-width: 600px; margin: 0 auto;">
+        .auth-card {
+            background: #141414;
+            border: 1px solid #262626;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        h1 { color: #8b5cf6; margin-bottom: 5px; }
+        .subtitle { color: #666; margin-bottom: 25px; }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-size: 13px;
+            color: #8b5cf6;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* Исправление полей ввода */
+        input, select {
+            width: 100%;
+            background: #000 !important;
+            color: white !important;
+            border: 1px solid #262626 !important;
+            border-radius: 10px;
+            padding: 12px;
+            box-sizing: border-box;
+            outline: none;
+            font-size: 14px;
+        }
+
+        input:focus, select:focus {
+            border-color: #8b5cf6 !important;
+        }
+
+        /* Стиль для заблокированного поля (срок действия) */
+        input[readonly] {
+            background: #0a0a0a !important;
+            color: #555 !important;
+            border-color: #1a1a1a !important;
+        }
+
+        .btn-main {
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 25px;
+            transition: 0.3s;
+        }
+
+        .btn-main:hover { background: #7c3aed; transform: translateY(-2px); }
+
+        .btn-exit {
+            background: transparent;
+            color: #666;
+            border: 1px solid #262626;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card">
         <h1>💳 ВОДИТЕЛЬСКАЯ ЛИЦЕНЗИЯ</h1>
         <p class="subtitle">Заполнение данных о прохождении экзамена</p>
 
-        <div id="license-form" style="text-align: left;">
+        <div id="license-form">
             <label>Имя и Фамилия (Name):</label>
             <input type="text" id="lic-name" placeholder="Ivan Ivanov">
 
@@ -27,16 +113,16 @@
             <input type="text" id="lic-issue" placeholder="Число/Месяц/Год">
 
             <label>Срок действия:</label>
-            <input type="text" id="lic-expiry" value="10 лет" readonly style="color: var(--text-dim); cursor: not-allowed;">
+            <input type="text" id="lic-expiry" value="10 лет" readonly>
 
             <label>Категория:</label>
-            <select id="lic-cat" style="width:100%; padding:12px; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:12px; margin:10px 0;">
-                <option value="A" style="background:#1a1425;">A — Траки / Большие прицепы</option>
-                <option value="B" style="background:#1a1425;" selected>B — Легковые (B+ Механика)</option>
-                <option value="C" style="background:#1a1425;">C — Траки / Средние прицепы</option>
+            <select id="lic-cat">
+                <option value="A">A — Траки / Большие прицепы</option>
+                <option value="B" selected>B — Легковые (B+ Механика)</option>
+                <option value="C">C — Траки / Средние прицепы</option>
             </select>
 
-            <h3 style="margin-top: 25px; color: var(--accent-purple); border-bottom: 1px solid rgba(139, 92, 246, 0.3); padding-bottom: 5px;">Данные инструктора</h3>
+            <h3 style="margin-top: 25px; color: #8b5cf6; border-bottom: 1px solid #262626; padding-bottom: 5px;">Данные инструктора</h3>
             
             <label>Telegram инструктора:</label>
             <input type="text" id="inst-tg" placeholder="@username">
@@ -44,11 +130,11 @@
             <label>Ник в Roblox инструктора:</label>
             <input type="text" id="inst-nick" placeholder="Roblox_Nick">
 
-            <label>Оценка за экзамен (по 10-бальной шкале):</label>
+            <label>Оценка за экзамен (1-10):</label>
             <input type="number" id="lic-score" min="1" max="10" placeholder="От 1 до 10">
 
-            <button onclick="sendLicenseApp()" class="btn-main" style="margin-top: 20px;">Подать заявку</button>
-            <button onclick="location.href='../index.html'" class="btn-exit" style="width: 100%; margin-top: 10px; border: none;">Вернуться назад</button>
+            <button onclick="sendLicenseApp()" class="btn-main">Подать заявку</button>
+            <button onclick="location.href='../index.html'" class="btn-exit">Вернуться назад</button>
         </div>
     </div>
 
@@ -58,8 +144,9 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         async function sendLicenseApp() {
-            const user = JSON.parse(localStorage.getItem('gvr_user'));
-            if(!user) return alert("Вы не вошли!");
+            const saved = localStorage.getItem('gvr_user');
+            if(!saved) return alert("Вы не вошли!");
+            const user = JSON.parse(saved);
 
             const formData = {
                 full_name: document.getElementById('lic-name').value,
@@ -73,11 +160,11 @@
                 score: document.getElementById('lic-score').value
             };
 
-            if(!formData.full_name  !formData.instructor_nick  !formData.score) {
-                return alert("Заполните все поля, включая данные инструктора!");
+            if(!formData.full_name || !formData.instructor_nick || !formData.score) {
+                return alert("Заполните все поля!");
             }
 
-const { error } = await supabaseClient
+            const { error } = await supabaseClient
                 .from('applications')
                 .insert([{ 
                     username: user.username, 
@@ -88,10 +175,10 @@ const { error } = await supabaseClient
 
             if (error) alert("Ошибка: " + error.message);
             else {
-                alert("Заявка на лицензию отправлена! Инструктор должен подтвердить факт сдачи.");
+                alert("Заявка отправлена!");
                 window.location.href = '../index.html';
             }
         }
     </script>
 </body>
-</html>
+    </html>
