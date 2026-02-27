@@ -5,33 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>КальтУслуги | GVRPA</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
-        /* ГЛОБАЛЬНАЯ ЦЕНТРОВКА */
+        /* 1. Центрируем всё на странице */
         body {
             background-color: #0a0a0a !important;
             color: white !important;
             font-family: 'Segoe UI', sans-serif;
             margin: 0;
             padding: 0;
-            /* Центрируем всё содержимое по горизонтали */
             display: flex;
             flex-direction: column;
-            align-items: center; 
+            align-items: center; /* Это центрирует всё по горизонтали */
             min-height: 100vh;
         }
 
-        /* ОСНОВНОЙ КОНТЕЙНЕР (ОГРАНИЧИВАЕТ ШИРИНУ) */
+        /* 2. Общая колонка (Шапка + Плитки) */
         .main-wrapper {
             width: 100%;
-            max-width: 1100px; /* Ширина всей композиции */
+            max-width: 1000px; /* Ограничиваем ширину, чтобы не расползалось */
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 0 20px;
+            padding: 20px;
             box-sizing: border-box;
         }
 
-        /* ПОЛОСКА НАВИГАЦИИ */
+        /* 3. Полоска навигации */
         .navbar {
             width: 100%;
             background-color: #141414;
@@ -41,33 +41,20 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 30px; /* Отступ от верха экрана */
+            margin-bottom: 20px;
             box-sizing: border-box;
         }
 
-        .nav-logo {
-            font-size: 20px;
-            font-weight: bold;
-            color: #8b5cf6;
-        }
-
-        .nav-user {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        /* СЕТКА ПЛИТОК */
+        /* 4. Сетка плиток */
         .grid {
             display: grid;
-            /* Здесь магия: плитки будут пытаться занять центр */
-            grid-template-columns: repeat(auto-fit, 250px); 
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 20px;
             width: 100%;
-            justify-content: center; /* Центрирует сами плитки внутри сетки */
-            padding: 40px 0;
+            justify-content: center; /* Центрирует плитки внутри сетки */
         }
 
+        /* 5. Карточки-плитки */
         .card {
             background: #141414;
             border: 1px solid #262626;
@@ -81,81 +68,30 @@
         .card:hover {
             border-color: #8b5cf6;
             transform: translateY(-5px);
-            background: #1a1a1a;
+            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.2);
         }
 
-        /* КНОПКИ */
-        .btn-profile {
-            background: #8b5cf6;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 13px;
-        }
+        /* Стили текста и кнопок */
+        .nav-logo { font-size: 20px; font-weight: bold; color: #8b5cf6; }
+        .nav-user { display: flex; align-items: center; gap: 15px; }
+        .btn-profile { background: #8b5cf6; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-exit { background: #333; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
+        .icon { font-size: 40px; display: block; margin-bottom: 10px; }
+        h3 { margin: 0; font-size: 16px; }
 
-        .btn-exit {
-            background: #333;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 13px;
-        }
-
-        .icon { font-size: 40px; display: block; margin-bottom: 15px; }
-        h3 { margin: 0; font-size: 16px; font-weight: 600; }
-
-        /* ЭКРАН ВХОДА (ТОЖЕ ПО ЦЕНТРУ) */
-        #auth-screen {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-grow: 1;
-        }
-
-        .auth-card {
-            background: #141414;
-            padding: 40px;
-            border-radius: 25px;
-            border: 1px solid #262626;
-            width: 320px;
-            text-align: center;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
-            background: #000;
-            border: 1px solid #262626;
-            border-radius: 10px;
-            color: white;
-            box-sizing: border-box;
-        }
-
-        .btn-main {
-            width: 100%;
-            padding: 12px;
-            margin-top: 20px;
-            background: #8b5cf6;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+        /* Экран входа */
+        #auth-screen { display: flex; justify-content: center; align-items: center; height: 100vh; width: 100%; }
+        .auth-card { background: #141414; padding: 40px; border-radius: 25px; border: 1px solid #262626; width: 320px; text-align: center; }
+        input { width: 100%; padding: 12px; margin-top: 10px; background: #000; border: 1px solid #262626; border-radius: 10px; color: white; box-sizing: border-box; }
+        .btn-main { width: 100%; padding: 12px; margin-top: 20px; background: #8b5cf6; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="auth-screen">
         <div class="auth-card">
-            <h1 style="color: #8b5cf6; margin: 0; font-size: 26px;">🏛 GVRPA</h1>
-            <p style="color: #a0a0a0; margin-bottom: 20px;">КальтУслуги</p>
+            <h1 style="color: #8b5cf6; margin: 0;">🏛 GVRPA</h1>
+            <p style="color: #a0a0a0;">КальтУслуги</p>
             <input type="text" id="login-nick" placeholder="Ник в Roblox">
             <input type="password" id="login-pass" placeholder="Пароль">
             <button onclick="login()" class="btn-main">Войти</button>
@@ -169,7 +105,7 @@
                 <div class="nav-logo">🏛 КальтУслуги</div>
                 <div class="nav-user">
                     <span id="user-display" style="color: #a0a0a0;">Загрузка...</span>
-                    <a id="admin-link" href="admin.html" style="display: none; color: #ef4444; font-weight: bold; text-decoration: none; font-size: 13px;">Панель</a>
+                    <a id="admin-link" href="admin.html" style="display: none; color: #ef4444; font-weight: bold; text-decoration: none;">Панель</a>
                     <button onclick="location.href='profile.html'" class="btn-profile">📂 Мои заявки</button>
                     <button onclick="logout()" class="btn-exit">Выход</button>
                 </div>
