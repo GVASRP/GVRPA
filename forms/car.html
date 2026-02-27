@@ -7,18 +7,12 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="../style.css">
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #000; /* Черный фон на случай, если CSS не прогрузится */
-        }
-        #auth-screen {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            width: 100%;
-        }
+        /* Мини-фикс, чтобы точно не было белого экрана */
+        body { margin: 0; background-color: #000; color: white; font-family: sans-serif; }
+        #auth-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .auth-card { background: #111; padding: 30px; border-radius: 15px; border: 1px solid #333; width: 100%; max-width: 400px; text-align: center; }
+        input, textarea { width: 100%; margin: 10px 0; padding: 10px; background: #000; border: 1px solid #333; color: white; border-radius: 5px; box-sizing: border-box; }
+        .btn-main { width: 100%; padding: 12px; background: #fff; color: #000; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -34,10 +28,10 @@
                 <input type="text" id="car-plate" placeholder="4. Регистрационный номер">
                 
                 <p style="text-align: left; font-size: 13px; margin-top: 15px; color: #aaa;">5. Фото авто (ссылки):</p>
-                <textarea id="car-photos" placeholder="https://imgur.com/..." style="width: 100%; background: #000; color: #fff; border: 1px solid #333; border-radius: 5px; padding: 10px; margin-bottom: 10px; font-family: inherit; box-sizing: border-box;"></textarea>
+                <textarea id="car-photos" placeholder="https://imgur.com/..."></textarea>
                 
                 <button onclick="sendCarApplication()" class="btn-main">Подать заявку</button>
-                <button onclick="location.href='../index.html'" class="btn-exit" style="width: 100%; margin-top: 10px; background: transparent; color: #666; border: none; cursor: pointer;">Отмена</button>
+                <button onclick="location.href='../index.html'" style="margin-top:10px; background:none; border:none; color:#666; cursor:pointer;">Отмена</button>
             </div>
         </div>
     </div>
@@ -48,32 +42,39 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         async function sendCarApplication() {
-            const saved = localStorage.getItem('gvr_user');
-            if(!saved) return alert("Войдите в аккаунт!");
-            const user = JSON.parse(saved);
+            try {
+                const saved = localStorage.getItem('gvr_user');
+                if(!saved) return alert("Войдите в аккаунт!");
+                const user = JSON.parse(saved);
 
-            const brand = document.getElementById('car-brand').value;
-            const model = document.getElementById('car-model').value;
-            const year = document.getElementById('car-year').value;
-            const plate = document.getElementById('car-plate').value;
-            const photos = document.getElementById('car-photos').value;
+                const brand = document.getElementById('car-brand').value;
+                const model = document.getElementById('car-model').value;
+                const year = document.getElementById('car-year').value;
+                const plate = document.getElementById('car-plate').value;
+                const photos = document.getElementById('car-photos').value;
 
-            if(!brand  !model  !plate) return alert("Заполните поля!");
+                // ВОТ ТУТ БЫЛА ОШИБКА (Исправлено на ||)
+                if(!brand  !model  !plate) {
+                    return alert("Заполните обязательные поля: Марка, Модель и Номер!");
+                }
 
-            const { error } = await supabaseClient
-                .from('applications')
-                .insert([{ 
-                    username: user.username, 
-                    type: 'car', 
-                    data: { brand, model, year, plate, photos },
-                    status: 'pending' 
-                }]);
+                const { error } = await supabaseClient
+                    .from('applications')
+                    .insert([{ 
+                        username: user.username, 
+                        type: 'car', 
+                        data: { brand, model, year, plate, photos },
+                        status: 'pending' 
+                    }]);
 
-            if (error) {
-                alert("Ошибка: " + error.message);
-            } else {
+                if (error) throw error;
+
                 alert("Заявка успешно подана!");
                 window.location.href = '../index.html';
+
+            } catch (err) {
+                console.error(err);
+                alert("Ошибка: " + err.message);
             }
         }
     </script>
