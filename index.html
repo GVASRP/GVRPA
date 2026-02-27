@@ -8,104 +8,216 @@
     <style>
         :root {
             --bg: #0a0a0a;
-            --card-bg: #141414;
+            --card: #141414;
             --accent: #8b5cf6;
+            --accent-hover: #7c3aed;
+            --text-main: #ffffff;
+            --text-dim: #666;
             --border: #262626;
         }
-        body { 
-            background: var(--bg); 
-            color: white; 
-            font-family: 'Segoe UI', sans-serif; 
-            margin: 0; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             min-height: 100vh;
         }
+
+        /* Контейнер авторизации */
         .auth-card {
-            background: var(--card-bg);
+            background: var(--card);
             border: 1px solid var(--border);
-            padding: 30px;
-            border-radius: 20px;
+            padding: 40px;
+            border-radius: 24px;
             width: 100%;
-            max-width: 350px;
+            max-width: 400px;
             text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
+
+        h1 { font-size: 32px; margin: 0; color: var(--accent); letter-spacing: 2px; }
+        .subtitle { color: var(--text-dim); margin-bottom: 30px; font-size: 14px; }
+
         input {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             margin: 10px 0;
             background: #000;
             border: 1px solid var(--border);
-            border-radius: 10px;
+            border-radius: 12px;
             color: white;
             box-sizing: border-box;
+            outline: none;
+            transition: 0.3s;
         }
+        input:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(139, 92, 246, 0.2); }
+
         .btn-main {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             background: var(--accent);
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             color: white;
             font-weight: bold;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 15px;
+            font-size: 16px;
+            transition: 0.3s;
         }
+        .btn-main:hover { background: var(--accent-hover); transform: translateY(-2px); }
+
+        /* ГЛАВНЫЙ ЭКРАН */
         #main-screen {
             display: none;
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+            flex-direction: column;
+        }
+
+        .header-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .welcome-text h2 { margin: 0; font-size: 28px; }
+        .welcome-text span { color: var(--accent); }
+
+        /* СЕТКА ПЛИТОК */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .tile {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 30px 20px;
+            border-radius: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
             flex-direction: column;
             align-items: center;
-        }
-        .tile-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
             gap: 15px;
-            margin-top: 20px;
         }
-        .tile {
-            background: var(--card-bg);
+
+        .tile:hover {
+            border-color: var(--accent);
+            background: #1a1425;
+            transform: translateY(-5px);
+        }
+
+        .tile i { font-size: 40px; }
+        .tile span { font-weight: bold; font-size: 18px; }
+        .tile p { margin: 0; font-size: 12px; color: var(--text-dim); }
+
+        /* СПЕЦ ПЛИТКИ */
+        .tile.police { border-color: #3b82f6; }
+        .tile.police:hover { background: #121a2b; }
+        .tile.admin { border-color: #ef4444; }
+        .tile.admin:hover { background: #2b1212; }
+
+        .btn-logout {
+            background: transparent;
             border: 1px solid var(--border);
-            padding: 20px;
-            border-radius: 15px;
+            color: var(--text-dim);
+            padding: 8px 16px;
+            border-radius: 10px;
             cursor: pointer;
-            text-align: center;
         }
+        .btn-logout:hover { color: white; border-color: white; }
     </style>
 </head>
 <body>
 
     <div id="auth-screen">
         <div class="auth-card">
-            <h1 style="color: var(--accent); margin-bottom: 5px;">🏛 GVRPA</h1>
-            <p style="color: #666; margin-bottom: 25px;">КальтУслуги</p>
+            <h1>🏛 GVRPA</h1>
+            <p class="subtitle">ГОСУДАРСТВЕННЫЕ УСЛУГИ</p>
 
             <div id="login-box">
                 <input type="text" id="login-nick" placeholder="Ник в Roblox">
                 <input type="password" id="login-pass" placeholder="Пароль">
-                <button onclick="login()" class="btn-main">Войти</button>
-                <p style="font-size: 13px; margin-top: 15px;">Нет аккаунта? <a href="javascript:void(0)" onclick="showReg(true)" style="color: var(--accent);">Создать</a></p>
+                <button onclick="login()" class="btn-main">Войти в систему</button>
+                <p style="font-size: 13px; margin-top: 20px; color: var(--text-dim);">
+                    Нет аккаунта? <a href="javascript:void(0)" onclick="showReg(true)" style="color: var(--accent); text-decoration: none;">Создать профиль</a>
+                </p>
             </div>
 
             <div id="reg-box" style="display: none;">
-                <input type="text" id="reg-nick" placeholder="Новый ник Roblox">
+                <input type="text" id="reg-nick" placeholder="Ник в Roblox">
                 <input type="password" id="reg-pass" placeholder="Придумайте пароль">
-                <input type="text" id="reg-tg" placeholder="Ваш Telegram">
+                <input type="text" id="reg-tg" placeholder="Ваш Telegram @">
                 <button onclick="register()" class="btn-main">Зарегистрироваться</button>
-                <p style="font-size: 13px; margin-top: 15px;">Уже есть аккаунт? <a href="javascript:void(0)" onclick="showReg(false)" style="color: var(--accent);">Войти</a></p>
+                <p style="font-size: 13px; margin-top: 20px; color: var(--text-dim);">
+                    Уже есть профиль? <a href="javascript:void(0)" onclick="showReg(false)" style="color: var(--accent); text-decoration: none;">Войти</a>
+                </p>
             </div>
         </div>
     </div>
 
     <div id="main-screen">
-        <h2>Добро пожаловать, <span id="user-display">---</span>!</h2>
-        <div class="tile-grid">
-            <div class="tile" onclick="openForm('id')">🪪 ID-Карта</div>
-            <div class="tile" onclick="openForm('license')">💳 Права</div>
-            <div class="tile" id="police-tile" style="display:none; border-color: #3b82f6;" onclick="location.href='police.html'">🚔 МВД</div>
-            <div class="tile" id="admin-link" style="display:none; border-color: #ef4444;" onclick="location.href='admin.html'">🛠 Админка</div>
+        <div class="header-main">
+            <div class="welcome-text">
+                <h2>Привет, <span id="user-display">---</span></h2>
+                <p style="color: var(--text-dim); margin: 5px 0 0 0;">Выберите услугу для оформления</p>
+            </div>
+            <button onclick="logout()" class="btn-logout">Выйти</button>
         </div>
-        <button onclick="logout()" style="margin-top: 30px; background: none; border: 1px solid #333; color: #666; padding: 10px 20px; border-radius: 10px; cursor: pointer;">Выйти</button>
+
+        <div class="grid">
+            <div class="tile" onclick="openForm('id')">
+                <div style="font-size: 40px;">🪪</div>
+                <span>ID-Карта</span>
+                <p>Регистрация гражданина</p>
+            </div>
+
+            <div class="tile" onclick="openForm('license')">
+                <div style="font-size: 40px;">💳</div>
+                <span>Водительские права</span>
+                <p>Лицензии категорий A, B, C</p>
+            </div>
+
+            <div class="tile" onclick="openForm('car')">
+                <div style="font-size: 40px;">🚔</div>
+                <span>Регистрация ТС</span>
+                <p>Постановка авто на учет</p>
+            </div>
+
+            <div class="tile" onclick="openForm('house')">
+                <div style="font-size: 40px;">🏠</div>
+                <span>Реестр жилья</span>
+                <p>Прописка и владение</p>
+            </div>
+
+            <div class="tile" onclick="openForm('marriage')">
+                <div style="font-size: 40px;">💍</div>
+                <span>ЗАГС</span>
+                <p>Регистрация брака</p>
+            </div>
+
+            <div class="tile police" id="police-tile" style="display:none;" onclick="location.href='police.html'">
+                <div style="font-size: 40px;">👮‍♂️</div>
+                <span style="color: #3b82f6;">БАЗА МВД</span>
+                <p>Розыск и штрафы</p>
+            </div>
+
+            <div class="tile admin" id="admin-link" style="display:none;" onclick="location.href='admin.html'">
+                <div style="font-size: 40px;">🛠</div>
+                <span style="color: #ef4444;">АДМИН-ПАНЕЛЬ</span>
+                <p>Проверка заявок</p>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -122,21 +234,19 @@
             const nick = document.getElementById('reg-nick').value.trim();
             const pass = document.getElementById('reg-pass').value.trim();
             const tg = document.getElementById('reg-tg').value.trim();
-
             if (!nick || !pass) return alert("Заполните ник и пароль!");
 
             const { error } = await supabaseClient
                 .from('profiles')
                 .insert([{ username: nick, password: pass, telegram: tg, role: 'user' }]);
 
-            if (error) alert("Ошибка регистрации: " + error.message);
-            else { alert("Успех! Теперь войдите."); showReg(false); }
+            if (error) alert("Ошибка: " + error.message);
+            else { alert("Регистрация успешна!"); showReg(false); }
         }
 
         async function login() {
             const nick = document.getElementById('login-nick').value.trim();
             const pass = document.getElementById('login-pass').value.trim();
-
             if (!nick || !pass) return alert("Введите данные!");
 
             const { data, error } = await supabaseClient
@@ -149,9 +259,7 @@
             if (data) {
                 localStorage.setItem('gvr_user', JSON.stringify(data));
                 renderMain(data);
-            } else {
-                alert("Неверный логин или пароль!");
-            }
+            } else { alert("Неверный логин или пароль!"); }
         }
 
         function renderMain(user) {
@@ -160,10 +268,10 @@
             document.getElementById('user-display').innerText = user.username;
 
             if (user.role === 'admin' || user.role === 'police') {
-                document.getElementById('police-tile').style.display = 'block';
+                document.getElementById('police-tile').style.display = 'flex';
             }
             if (user.role === 'admin') {
-                document.getElementById('admin-link').style.display = 'block';
+                document.getElementById('admin-link').style.display = 'flex';
             }
         }
 
