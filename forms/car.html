@@ -6,54 +6,50 @@
     <title>Регистрация ТС | КальтУслуги</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="../style.css">
-    <style>
-        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; }
-        #auth-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-        .auth-card { background: #111; padding: 30px; border-radius: 15px; border: 1px solid #333; width: 350px; text-align: center; }
-        input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box; }
-        .btn-main { width: 100%; padding: 14px; margin-top: 20px; background: #fff; color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; }
-        .btn-exit { background: none; border: none; color: #666; margin-top: 15px; cursor: pointer; width: 100%; }
-    </style>
 </head>
-<body>
+<body style="background: #000; color: #fff; font-family: sans-serif; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh;">
 
-    <div id="auth-screen">
-        <div class="auth-card">
-            <h1>🚗 РЕГИСТРАЦИЯ ТС</h1>
-            <p style="color: #888; margin-bottom: 20px;">Введите данные автомобиля</p>
-            
-            <input type="text" id="car-brand" placeholder="Марка">
-            <input type="text" id="car-model" placeholder="Модель">
-            <input type="text" id="car-plate" placeholder="Гос. номер">
-            
-            <button onclick="sendCarData()" class="btn-main">Отправить заявку</button>
-            <button onclick="window.location.href='../index.html'" class="btn-exit">Отмена</button>
-        </div>
+    <div style="background: #111; padding: 30px; border-radius: 15px; border: 1px solid #333; width: 350px; text-align: center;">
+        <h1 style="font-size: 24px; margin-bottom: 20px;">🚗 РЕГИСТРАЦИЯ ТС</h1>
+        
+        <input type="text" id="car-brand" placeholder="Марка" style="width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box;">
+        <input type="text" id="car-model" placeholder="Модель" style="width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box;">
+        <input type="text" id="car-plate" placeholder="Номер" style="width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box;">
+        
+        <button onclick="sendCarData()" style="width: 100%; padding: 14px; margin-top: 20px; background: #fff; color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
+            Отправить заявку
+        </button>
+        
+        <button onclick="window.location.href='../index.html'" style="background: none; border: none; color: #666; margin-top: 15px; cursor: pointer;">
+            Отмена
+        </button>
     </div>
 
     <script>
+        // Проверка: работает ли вообще скрипт?
+        console.log("Скрипт car.html успешно загружен и прочитан браузером!");
+
         const SUPABASE_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         async function sendCarData() {
-            console.log("Попытка отправки данных...");
+            console.log("Кнопка нажата!");
 
-            const brandVal = document.getElementById('car-brand').value;
-            const modelVal = document.getElementById('car-model').value;
-            const plateVal = document.getElementById('car-plate').value;
+            const brand = document.getElementById('car-brand').value.trim();
+            const model = document.getElementById('car-model').value.trim();
+            const plate = document.getElementById('car-plate').value.trim();
 
-            if (!brandVal  !modelVal  !plateVal) {
-                alert("Пожалуйста, заполните все поля!");
+            if (!brand  !model  !plate) {
+                alert("Заполните все поля!");
                 return;
             }
 
             const storedUser = localStorage.getItem('gvr_user');
             if (!storedUser) {
-                alert("Ошибка: вы не авторизованы!");
+                alert("Ошибка: вы не вошли в аккаунт!");
                 return;
             }
-
             const user = JSON.parse(storedUser);
 
             try {
@@ -62,21 +58,16 @@
                     .insert([{ 
                         username: user.username, 
                         type: 'car', 
-                        data: { 
-                            brand: brandVal, 
-                            model: modelVal, 
-                            plate: plateVal 
-                        },
+                        data: { brand, model, plate },
                         status: 'pending' 
                     }]);
 
                 if (error) throw error;
-
-                alert("✅ Заявка успешно отправлена!");
+                alert("Заявка отправлена!");
                 window.location.href = '../index.html';
             } catch (err) {
-                console.error(err);
-                alert("Ошибка при отправке: " + err.message);
+                console.error("Ошибка Supabase:", err);
+                alert("Ошибка: " + err.message);
             }
         }
     </script>
