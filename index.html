@@ -6,28 +6,32 @@
     <title>КальтУслуги | GVRPA</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* БАЗОВЫЕ НАСТРОЙКИ */
+        /* ГЛОБАЛЬНАЯ ЦЕНТРОВКА */
         body {
             background-color: #0a0a0a !important;
             color: white !important;
             font-family: 'Segoe UI', sans-serif;
             margin: 0;
             padding: 0;
+            /* Центрируем всё содержимое по горизонтали */
             display: flex;
             flex-direction: column;
-            align-items: center; /* Центрирует всё содержимое body */
+            align-items: center; 
+            min-height: 100vh;
         }
 
-        /* КОНТЕЙНЕР ДЛЯ ОДИНАКОВОЙ ШИРИНЫ */
-        .content-wrapper {
-            width: 95%;
-            max-width: 1000px; /* Фиксируем ширину для всего */
+        /* ОСНОВНОЙ КОНТЕЙНЕР (ОГРАНИЧИВАЕТ ШИРИНУ) */
+        .main-wrapper {
+            width: 100%;
+            max-width: 1100px; /* Ширина всей композиции */
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding: 0 20px;
+            box-sizing: border-box;
         }
 
-        /* ПОЛОСКА НАВИГАЦИИ (ВЫШЕ) */
+        /* ПОЛОСКА НАВИГАЦИИ */
         .navbar {
             width: 100%;
             background-color: #141414;
@@ -37,7 +41,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 20px;
+            margin-top: 30px; /* Отступ от верха экрана */
             box-sizing: border-box;
         }
 
@@ -53,44 +57,22 @@
             gap: 15px;
         }
 
-        #user-display { color: #a0a0a0; font-size: 14px; }
-
-        /* КНОПКИ В ШАПКЕ */
-        .btn-profile {
-            background: #8b5cf6;
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: bold;
-        }
-
-        .btn-exit {
-            background: #333;
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 13px;
-        }
-
-        /* СЕТКА ПЛИТОК (НИЖЕ) */
+        /* СЕТКА ПЛИТОК */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-            gap: 15px;
+            /* Здесь магия: плитки будут пытаться занять центр */
+            grid-template-columns: repeat(auto-fit, 250px); 
+            gap: 20px;
             width: 100%;
-            padding: 30px 0; /* Отступ сверху и снизу */
+            justify-content: center; /* Центрирует сами плитки внутри сетки */
+            padding: 40px 0;
         }
 
         .card {
             background: #141414;
             border: 1px solid #262626;
-            border-radius: 18px;
-            padding: 25px;
+            border-radius: 20px;
+            padding: 30px;
             text-align: center;
             cursor: pointer;
             transition: 0.3s;
@@ -102,21 +84,37 @@
             background: #1a1a1a;
         }
 
-        .icon {
-            font-size: 35px;
-            display: block;
-            margin-bottom: 10px;
+        /* КНОПКИ */
+        .btn-profile {
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
         }
 
-        h3 { margin: 0; font-size: 15px; font-weight: 600; }
+        .btn-exit {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+        }
 
-        /* ЭКРАН ВХОДА */
+        .icon { font-size: 40px; display: block; margin-bottom: 15px; }
+        h3 { margin: 0; font-size: 16px; font-weight: 600; }
+
+        /* ЭКРАН ВХОДА (ТОЖЕ ПО ЦЕНТРУ) */
         #auth-screen {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            width: 100%;
+            flex-grow: 1;
         }
 
         .auth-card {
@@ -156,7 +154,7 @@
 
     <div id="auth-screen">
         <div class="auth-card">
-            <h1 style="color: #8b5cf6; margin: 0; font-size: 24px;">🏛 GVRPA</h1>
+            <h1 style="color: #8b5cf6; margin: 0; font-size: 26px;">🏛 GVRPA</h1>
             <p style="color: #a0a0a0; margin-bottom: 20px;">КальтУслуги</p>
             <input type="text" id="login-nick" placeholder="Ник в Roblox">
             <input type="password" id="login-pass" placeholder="Пароль">
@@ -165,32 +163,32 @@
     </div>
 
     <div id="main-screen" style="display: none; width: 100%;">
-        <center>
-            <div class="content-wrapper">
-                <nav class="navbar">
-                    <div class="nav-logo">🏛 КальтУслуги</div>
-                    <div class="nav-user">
-                        <span id="user-display">...</span>
-                        <a id="admin-link" href="admin.html" style="display: none; color: #ef4444; font-weight: bold; text-decoration: none; font-size: 13px;">Панель</a>
-                        <button onclick="location.href='profile.html'" class="btn-profile">📂 Мои заявки</button>
-                        <button onclick="logout()" class="btn-exit">Выход</button>
-                    </div>
-                </nav>
-
-                <div class="grid">
-                    <div class="card" onclick="openForm('car')"><span class="icon">🚗</span><h3>Регистрация авто</h3></div>
-                    <div class="card" onclick="openForm('id')"><span class="icon">🪪</span><h3>ID-карта</h3></div>
-                    <div class="card" onclick="openForm('license')"><span class="icon">💳</span><h3>Вод. права</h3></div>
-                    <div class="card" onclick="openForm('house')"><span class="icon">🏠</span><h3>Регистрация дома</h3></div>
-                    <div class="card" onclick="openForm('accident')"><span class="icon">💥</span><h3>Регистрация ДТП</h3></div>
-                    <div class="card" onclick="openForm('court')"><span class="icon">⚖️</span><h3>Подать в суд</h3></div>
-                    <div class="card" onclick="openForm('marriage')"><span class="icon">💍</span><h3>ЗАГС</h3></div>
-                    <div class="card" onclick="linkTelegram()"><span class="icon">✈️</span><h3>Telegram</h3></div>
-                    <div class="card" onclick="openForm('realty')"><span class="icon">🏗</span><h3>Недвижимость</h3></div>
-                    <div class="card" onclick="openForm('rules')"><span class="icon">📜</span><h3>Правила</h3></div>
+        <div class="main-wrapper">
+            
+            <nav class="navbar">
+                <div class="nav-logo">🏛 КальтУслуги</div>
+                <div class="nav-user">
+                    <span id="user-display" style="color: #a0a0a0;">Загрузка...</span>
+                    <a id="admin-link" href="admin.html" style="display: none; color: #ef4444; font-weight: bold; text-decoration: none; font-size: 13px;">Панель</a>
+                    <button onclick="location.href='profile.html'" class="btn-profile">📂 Мои заявки</button>
+                    <button onclick="logout()" class="btn-exit">Выход</button>
                 </div>
+            </nav>
+
+            <div class="grid">
+                <div class="card" onclick="openForm('car')"><span class="icon">🚗</span><h3>Регистрация авто</h3></div>
+                <div class="card" onclick="openForm('id')"><span class="icon">🪪</span><h3>ID-карта</h3></div>
+                <div class="card" onclick="openForm('license')"><span class="icon">💳</span><h3>Вод. права</h3></div>
+                <div class="card" onclick="openForm('house')"><span class="icon">🏠</span><h3>Регистрация дома</h3></div>
+                <div class="card" onclick="openForm('accident')"><span class="icon">💥</span><h3>Регистрация ДТП</h3></div>
+                <div class="card" onclick="openForm('court')"><span class="icon">⚖️</span><h3>Подать в суд</h3></div>
+                <div class="card" onclick="openForm('marriage')"><span class="icon">💍</span><h3>ЗАГС</h3></div>
+                <div class="card" onclick="linkTelegram()"><span class="icon">✈️</span><h3>Telegram</h3></div>
+                <div class="card" onclick="openForm('realty')"><span class="icon">🏗</span><h3>Недвижимость</h3></div>
+                <div class="card" onclick="openForm('rules')"><span class="icon">📜</span><h3>Правила</h3></div>
             </div>
-        </center>
+
+        </div>
     </div>
 
     <script src="script.js"></script>
