@@ -6,26 +6,28 @@
     <title>Регистрация ТС | КальтУслуги</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="../style.css">
+    <style>
+        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; }
+        #auth-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .auth-card { background: #111; padding: 30px; border-radius: 15px; border: 1px solid #333; width: 350px; text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box; }
+        .btn-main { width: 100%; padding: 14px; margin-top: 20px; background: #fff; color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; }
+        .btn-exit { background: none; border: none; color: #666; margin-top: 15px; cursor: pointer; width: 100%; }
+    </style>
 </head>
-<body style="background: #000; color: #fff; font-family: sans-serif; margin: 0;">
+<body>
 
-    <div id="auth-screen" style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
-        <div class="auth-card" style="background: #111; padding: 30px; border-radius: 15px; border: 1px solid #333; width: 350px; text-align: center;">
-            <h1 style="font-size: 24px;">🚗 РЕГИСТРАЦИЯ ТС</h1>
+    <div id="auth-screen">
+        <div class="auth-card">
+            <h1>🚗 РЕГИСТРАЦИЯ ТС</h1>
+            <p style="color: #888; margin-bottom: 20px;">Введите данные автомобиля</p>
             
-            <div style="margin-top: 20px;">
-                <input type="text" id="car-brand" placeholder="Марка" style="width: 100%; padding: 10px; margin: 5px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 5px;">
-                <input type="text" id="car-model" placeholder="Модель" style="width: 100%; padding: 10px; margin: 5px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 5px;">
-                <input type="text" id="car-plate" placeholder="Номер" style="width: 100%; padding: 10px; margin: 5px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 5px;">
-                
-                <button onclick="sendCarData()" style="width: 100%; padding: 12px; margin-top: 15px; background: #fff; color: #000; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
-                    Отправить заявку
-                </button>
-                
-                <button onclick="window.location.href='../index.html'" style="background: none; border: none; color: #666; margin-top: 10px; cursor: pointer;">
-                    Отмена
-                </button>
-            </div>
+            <input type="text" id="car-brand" placeholder="Марка">
+            <input type="text" id="car-model" placeholder="Модель">
+            <input type="text" id="car-plate" placeholder="Гос. номер">
+            
+            <button onclick="sendCarData()" class="btn-main">Отправить заявку</button>
+            <button onclick="window.location.href='../index.html'" class="btn-exit">Отмена</button>
         </div>
     </div>
 
@@ -35,22 +37,23 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         async function sendCarData() {
-            // Берем значения по одному
-            const b = document.getElementById('car-brand').value;
-            const m = document.getElementById('car-model').value;
-            const p = document.getElementById('car-plate').value;
+            console.log("Попытка отправки данных...");
 
-            // Самая простая проверка в мире
-            if (b == ""  m == ""  p == "") {
-                alert("Заполните все поля!");
+            const brandVal = document.getElementById('car-brand').value;
+            const modelVal = document.getElementById('car-model').value;
+            const plateVal = document.getElementById('car-plate').value;
+
+            if (!brandVal  !modelVal  !plateVal) {
+                alert("Пожалуйста, заполните все поля!");
                 return;
             }
 
             const storedUser = localStorage.getItem('gvr_user');
             if (!storedUser) {
-                alert("Вы не вошли в систему!");
+                alert("Ошибка: вы не авторизованы!");
                 return;
             }
+
             const user = JSON.parse(storedUser);
 
             try {
@@ -59,15 +62,21 @@
                     .insert([{ 
                         username: user.username, 
                         type: 'car', 
-                        data: { brand: b, model: m, plate: p },
+                        data: { 
+                            brand: brandVal, 
+                            model: modelVal, 
+                            plate: plateVal 
+                        },
                         status: 'pending' 
                     }]);
 
                 if (error) throw error;
-                alert("Успешно!");
+
+                alert("✅ Заявка успешно отправлена!");
                 window.location.href = '../index.html';
             } catch (err) {
-                alert("Ошибка: " + err.message);
+                console.error(err);
+                alert("Ошибка при отправке: " + err.message);
             }
         }
     </script>
