@@ -1,175 +1,169 @@
+/* --- ОСНОВНЫЕ НАСТРОЙКИ --- */
 :root {
-    --bg-dark: #0f0a19;
-    --card-bg: #1a1425;
-    --accent-purple: #8b5cf6;
-    --text-main: #ffffff;
-    --text-dim: #a1a1aa;
-    --glow: 0 0 20px rgba(139, 92, 246, 0.3);
+    --bg: #0a0a0a;
+    --card-bg: #141414;
+    --text: #ffffff;
+    --text-dim: #a0a0a0;
+    --accent: #8b5cf6;
+    --border: #262626;
+    --danger: #ef4444;
 }
 
-body, html {
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     margin: 0;
     padding: 0;
-    width: 100%;
-    height: 100%;
-    font-family: 'Inter', 'Segoe UI', sans-serif;
-    background-color: var(--bg-dark);
-    color: var(--text-main);
-    display: flex;
-    justify-content: center; /* Всегда по центру по горизонтали */
-    align-items: center;     /* Всегда по центру по вертикали */
+    line-height: 1.5;
 }
 
-/* Общий контейнер, чтобы контент не разъезжался */
-#auth-screen, #main-screen {
-    width: 100%;
-    max-width: 1200px;
+/* --- НАВИГАЦИЯ (ИСПРАВЛЕННАЯ) --- */
+.navbar {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    justify-content: space-between; /* Лого слева, профиль справа */
     align-items: center;
-    padding: 20px;
-}
-
-/* КАРТОЧКА АВТОРИЗАЦИИ */
-.auth-card {
+    padding: 15px 30px;
     background: var(--card-bg);
-    padding: 40px;
-    border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: var(--glow);
-    text-align: center;
-    width: 100%;
-    max-width: 400px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
-h1 {
-    font-size: 2.5rem;
-    background: linear-gradient(to right, #a78bfa, #8b5cf6);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 10px;
-    letter-spacing: -1px;
+.nav-logo {
+    font-size: 22px !important; /* Фиксированный размер */
+    font-weight: bold;
+    flex-shrink: 0; /* Запрещаем сжиматься */
+    color: var(--text);
 }
 
-.subtitle {
+.nav-user {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Расстояние между элементами */
+}
+
+/* Контейнер для ссылки админа и кнопки заявок */
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#user-display {
     color: var(--text-dim);
-    margin-bottom: 30px;
+    font-weight: 500;
 }
 
-/* ПОЛЯ ВВОДА */
-input {
-    width: 100%;
-    padding: 14px;
-    margin: 10px 0;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    color: white;
-    font-size: 16px;
-    transition: 0.3s;
-}
+/* --- КНОПКИ И ССЫЛКИ --- */
 
-input:focus {
-    outline: none;
-    border-color: var(--accent-purple);
-    background: rgba(255, 255, 255, 0.08);
-}
-
-/* КНОПКИ */
-.btn-main {
-    width: 100%;
-    padding: 14px;
-    background: var(--accent-purple);
+/* Кнопка Мои заявки */
+.btn-profile {
+    background: var(--accent);
     color: white;
     border: none;
-    border-radius: 12px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
     font-weight: 600;
-    cursor: pointer;
-    transition: 0.3s;
-    margin-top: 10px;
+    white-space: nowrap;
+    transition: 0.3s ease;
 }
 
-.btn-main:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 15px rgba(139, 92, 246, 0.6);
+.btn-profile:hover {
+    filter: brightness(1.2);
+    transform: translateY(-1px);
 }
 
-.link {
-    color: var(--accent-purple);
-    cursor: pointer;
-    font-size: 14px;
+/* Ссылка на админку (Панель) */
+#admin-link {
+    color: var(--danger);
+    font-size: 13px;
     text-decoration: none;
+    border: 1px solid var(--danger);
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: 0.3s;
+    font-weight: 600;
 }
 
-/* СЕТКА ПЛИТОК */
+#admin-link:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+/* Кнопка Выход */
+.btn-exit {
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: 0.3s;
+}
+
+.btn-exit:hover {
+    background: var(--danger);
+    color: white;
+    border-color: var(--danger);
+}
+
+/* --- СЕТКА КАРТОЧЕК (ГЛАВНАЯ) --- */
+.container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 20px;
-    width: 100%;
-    margin-top: 30px;
 }
 
 .card {
     background: var(--card-bg);
-    padding: 30px 20px;
+    border: 1px solid var(--border);
+    padding: 35px 20px;
     border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
     text-align: center;
-    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .card:hover {
-    background: rgba(139, 92, 246, 0.1);
-    border-color: var(--accent-purple);
-    transform: scale(1.05);
+    border-color: var(--accent);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
-.card .icon {
-    font-size: 40px;
+.icon {
+    font-size: 45px;
     display: block;
     margin-bottom: 15px;
-    filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.4));
 }
 
 .card h3 {
-    font-size: 14px;
-    font-weight: 500;
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+/* --- ДОПОЛНИТЕЛЬНО --- */
+.subtitle {
     color: var(--text-dim);
+    text-align: center;
+    margin-bottom: 30px;
 }
 
-/* ШАПКА */
-.navbar {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 40px;
-}
-
-.btn-exit {
-    background: rgba(255, 0, 0, 0.1);
-    color: #ff4d4d;
-    border: 1px solid rgba(255, 0, 0, 0.2);
-    padding: 8px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-}
-.btn-profile {
-    background: #8b5cf6;
-    color: white;
-    border: none;
-    padding: 5px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 13px;
-    margin-left: 10px;
-    transition: 0.3s;
-}
-
-.btn-profile:hover {
-    background: #7c3aed;
-    transform: translateY(-1px);
+h1 {
+    text-align: center;
+    margin-top: 40px;
 }
