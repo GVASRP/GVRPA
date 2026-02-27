@@ -3,8 +3,13 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 function showReg(show) {
-    document.getElementById('login-box').style.display = show ? 'none' : 'block';
-    document.getElementById('reg-box').style.display = show ? 'block' : 'none';
+    // Если на странице нет этих ID (например, в формах), код не сломается
+    const loginBox = document.getElementById('login-box');
+    const regBox = document.getElementById('reg-box');
+    if (loginBox && regBox) {
+        loginBox.style.display = show ? 'none' : 'block';
+        regBox.style.display = show ? 'block' : 'none';
+    }
 }
 
 async function register() {
@@ -45,12 +50,36 @@ async function login() {
     }
 }
 
+// ГЛАВНАЯ ФУНКЦИЯ ОТОБРАЖЕНИЯ ИНТЕРФЕЙСА
 function renderMain(user) {
-    document.getElementById('auth-screen').style.display = 'none';
-    document.getElementById('main-screen').style.display = 'flex';
+    const authScreen = document.getElementById('auth-screen');
+    const mainScreen = document.getElementById('main-screen');
+    
+    if (authScreen) authScreen.style.display = 'none';
+    if (mainScreen) mainScreen.style.display = 'flex';
+    
     document.getElementById('user-display').innerText = user.username;
-    if (user.role === 'admin' || user.role === 'police') {
-        document.getElementById('police-tile').style.display = 'block';
+
+    // ПРОВЕРКА РОЛЕЙ ДЛЯ КНОПОК
+    const policeTile = document.getElementById('police-tile');
+    const adminLink = document.getElementById('admin-link');
+
+    // Показываем плитку МВД (для админов и полиции)
+    if (policeTile) {
+        if (user.role === 'admin' || user.role === 'police') {
+            policeTile.style.display = 'block';
+        } else {
+            policeTile.style.display = 'none';
+        }
+    }
+
+    // Показываем ссылку на админ-панель (только для админов)
+    if (adminLink) {
+        if (user.role === 'admin') {
+            adminLink.style.display = 'inline';
+        } else {
+            adminLink.style.display = 'none';
+        }
     }
 }
 
@@ -60,32 +89,33 @@ function logout() {
 }
 
 function openForm(type) {
-    if (type === 'police') {
-        window.location.href = 'police.html';
-    } else {
-        window.location.href = 'forms/' + type + '.html';
-    }
+    window.location.href = 'forms/' + type + '.html';
 }
 
 async function sendApp(type, info) {
     const user = JSON.parse(localStorage.getItem('gvr_user'));
     const { error } = await supabaseClient
         .from('applications')
-        .insert([{ username: user.username, type: type, data: { details: info }, status: 'pending' }]);
+        .insert([{ username: user.username, type: type, data: info, status: 'pending' }]);
 
     if (error) alert("Ошибка отправки");
     else alert("Заявка отправлена админам!");
 }
 
+// При загрузке страницы проверяем, залогинен ли юзер
 window.onload = () => {
     const saved = localStorage.getItem('gvr_user');
-    if (saved) renderMain(JSON.parse(saved));
+    if (saved) {
+        renderMain(JSON.parse(saved));
+    }
 };
 
 // --- ФУНКЦИИ ТЕЛЕГРАМА ---
 
 function linkTelegram() {
-    document.getElementById('tg-modal').style.display = 'flex';
+    const modal = document.getElementById('tg-modal');
+    if (modal) modal.style.display = 'flex';
+    else alert("Функция Telegram временно недоступна");
 }
 
 async function saveTgId() {
@@ -99,7 +129,7 @@ async function saveTgId() {
 
     if (!tgId) return alert("Введите ID!");
 
-    const { data, error } = await supabaseClient
+    const { error } = await supabaseClient
         .from('telegram_users')
         .upsert([{ 
             username: robloxNick, 
@@ -110,17 +140,7 @@ async function saveTgId() {
         alert("Ошибка: " + error.message);
     } else {
         alert("Успешно привязано! Теперь ждите уведомлений.");
-        document.getElementById('tg-modal').style.display = 'none';
-    }
-}
-// Вставь это туда, где ты записываешь ник в #user-display
-const saved = localStorage.getItem('gvr_user');
-if (saved) {
-    const user = JSON.parse(saved);
-    document.getElementById('user-display').innerText = user.username;
-
-    // Если ты админ — показываем скрытую ссылку
-    if (user.role === 'admin') {
-        document.getElementById('admin-link').style.display = 'inline';
+        const modal = document.getElementById('tg-modal');
+        if (modal) modal.style.display = 'none';
     }
 }
