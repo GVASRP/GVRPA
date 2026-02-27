@@ -4,23 +4,73 @@
     <meta charset="UTF-8">
     <title>База Данных GVRPA | Полиция</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body style="display: block; padding: 20px;">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --card-bg: #141414;
+            --accent: #8b5cf6;
+            --danger: #ef4444;
+            --border: #262626;
+        }
+        body { background: var(--bg); color: white; font-family: sans-serif; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn-exit { background: #333; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; }
 
-    <div class="container" style="max-width: 900px; margin: 0 auto;">
-        <div style="display:flex; justify-content: space-between; align-items: center;">
+        /* Поиск */
+        .search-area { background: var(--card-bg); border: 1px solid var(--border); padding: 20px; border-radius: 15px; margin-bottom: 20px; }
+        input { width: 70%; padding: 12px; background: #000; border: 1px solid var(--border); color: white; border-radius: 8px; }
+        .btn-search { width: 25%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+        /* Карточка досье */
+        .dossier-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 30px; display: none; }
+        .wanted-tag { padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 20px; }
+        .status-red { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+        .status-green { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; }
+
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
+        .info-box { background: #000; padding: 15px; border-radius: 10px; border: 1px solid var(--border); }
+        .label { color: #666; font-size: 12px; margin-bottom: 5px; text-transform: uppercase; }
+        
+        /* Кнопки действий */
+        .actions { display: flex; gap: 10px; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px; }
+        .btn-action { flex: 1; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
             <h1>📂 ГОСУДАРСТВЕННЫЙ РЕЕСТР</h1>
             <button onclick="location.href='index.html'" class="btn-exit">Выход</button>
         </div>
 
-        <div class="auth-card" style="margin: 20px 0; max-width: 100%;">
-            <input type="text" id="search-nick" placeholder="Введите Ник игрока для проверки..." style="margin-bottom: 0;">
-            <button onclick="searchPlayer()" class="btn-main" style="margin-top: 15px;">Найти досье</button>
+        <div class="search-area">
+            <input type="text" id="search-nick" placeholder="Введите Ник игрока...">
+            <button onclick="searchPlayer()" class="btn-search">Найти досье</button>
         </div>
 
-        <div id="results">
+        <div id="results" class="dossier-card">
+            <div id="wanted-status" class="wanted-tag">ЗАГРУЗКА...</div>
+            
+            <h2 id="res-nick" style="margin:0; font-size: 28px; color: var(--accent);">NICKNAME</h2>
+            <p id="res-fullname" style="color: #aaa; margin-top: 5px;">Имя не указано</p>
+
+            <div class="info-grid">
+                <div class="info-box"><div class="label">Семья</div><div id="res-spouse">Холост</div></div>
+                <div class="info-box"><div class="label">Вод. Права</div><div id="res-license">Нет</div></div>
+                <div class="info-box" style="grid-column: span 2;"><div class="label">Место жительства</div><div id="res-address">Нет данных</div></div>
+                <div class="info-box" style="grid-column: span 2;"><div class="label">Транспорт</div><div id="res-cars">Нет записей</div></div>
             </div>
+
+            <div class="actions">
+                <button onclick="updateDB('is_wanted', true)" class="btn-action" style="background: var(--danger);">В РОЗЫСК</button>
+
+<button onclick="updateDB('is_wanted', false)" class="btn-action" style="background: #333;">СНЯТЬ РОЗЫСК</button>
+                <button onclick="updateDB('has_license', true)" class="btn-action" style="background: #10b981;">ВЫДАТЬ ПРАВА</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -28,50 +78,64 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        let currentTarget = "";
+
         async function searchPlayer() {
             const nick = document.getElementById('search-nick').value.trim();
-            if(!nick) return alert("Введите ник!");
+            if(!nick) return;
 
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = '<p class="subtitle">Поиск в архивах...</p>';
-
-            // Ищем в таблице applications только ОДОБРЕННЫЕ (approved) записи
+            // Теперь ищем в таблице CITIZENS (наша новая база)
             const { data, error } = await supabaseClient
-                .from('applications')
+                .from('citizens')
                 .select('*')
-                .eq('status', 'approved')
-                .ilike('username', nick); // Ищем по нику (регистр не важен)
+                .eq('roblox_nick', nick)
+                .single();
 
-            resultsDiv.innerHTML = '';
-
-            if (data.length === 0) {
-                resultsDiv.innerHTML = '<div class="card" style="border: 1px solid #ef4444;">❌ Гражданин не найден в базе данных.</div>';
+            if (error || !data) {
+                alert("Гражданин не найден в официальной базе.");
+                document.getElementById('results').style.display = 'none';
                 return;
             }
 
-            data.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.style.textAlign = 'left';
-                card.style.marginBottom = '15px';
+            currentTarget = nick;
+            showDossier(data);
+        }
 
-                let info = '';
-                if (typeof item.data === 'object') {
-                    info = Object.entries(item.data)
-                        .map(([key, val]) => <b>${key}:</b> ${val})
-                        .join('<br>');
-                } else {
-                    info = item.data;
-                }
+        function showDossier(data) {
+            const res = document.getElementById('results');
+            res.style.display = 'block';
 
-                card.innerHTML = 
-                    <div style="border-bottom: 1px solid rgba(139, 92, 246, 0.3); padding-bottom: 5px; margin-bottom: 10px;">
-                        <span style="color: var(--accent-purple); font-weight: bold; text-transform: uppercase;">${item.type}</span>
-                    </div>
-                    <div style="font-size: 14px; line-height: 1.6;">${info}</div>
-                ;
-                resultsDiv.appendChild(card);
-            });
+            document.getElementById('res-nick').innerText = data.roblox_nick;
+            document.getElementById('res-fullname').innerText = data.full_name || "Неизвестно";
+            document.getElementById('res-spouse').innerText = data.spouse || "Нет";
+            document.getElementById('res-address').innerText = data.address || "Бомж";
+            document.getElementById('res-cars').innerText = data.car_data || "Нет транспорта";
+            document.getElementById('res-license').innerText = data.has_license ? "ДЕЙСТВИТЕЛЬНЫ" : "ОТСУТСТВУЮТ";
+
+            const status = document.getElementById('wanted-status');
+            if(data.is_wanted) {
+                status.innerText = "⚠ ВНИМАНИЕ: В РОЗЫСКЕ";
+                status.className = "wanted-tag status-red";
+            } else {
+                status.innerText = "В РОЗЫСКЕ НЕ ЗНАЧИТСЯ";
+                status.className = "wanted-tag status-green";
+            }
+        }
+
+        async function updateDB(field, value) {
+            if(!currentTarget) return;
+            const updates = {};
+            updates[field] = value;
+
+            const { error } = await supabaseClient
+                .from('citizens')
+                .update(updates)
+                .eq('roblox_nick', currentTarget);
+
+            if(!error) {
+                alert("База данных МВД обновлена!");
+                searchPlayer(); // Обновляем инфу на экране
+            }
         }
     </script>
 </body>
