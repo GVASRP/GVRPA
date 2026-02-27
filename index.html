@@ -34,43 +34,35 @@
     <div id="main-screen" style="display: none;">
         <nav class="navbar">
             <div class="nav-logo">🏛 КальтУслуги</div>
-            
             <div class="nav-user">
                 <span id="user-display">Загрузка...</span>
-                
-                <div class="nav-actions">
-                    <a id="admin-link" href="admin.html" style="display: none;">Панель</a>
-                    
-                    <button onclick="location.href='profile.html'" class="btn-profile">📂 Мои заявки</button>
-                </div>
-
+                <a id="admin-link" href="admin.html" style="display: none; color: #ef4444; text-decoration: none; font-weight: bold; margin: 0 10px;">Панель</a>
+                <button onclick="location.href='profile.html'" class="btn-profile">📂 Мои заявки</button>
                 <button onclick="logout()" class="btn-exit">Выход</button>
             </div>
         </nav>
 
-        <div class="grid">
-            <div class="card" onclick="openForm('car')"><span class="icon">🚗</span><h3>Регистрация авто</h3></div>
-            <div class="card" onclick="openForm('id')"><span class="icon">🪪</span><h3>ID-карта</h3></div>
-            <div class="card" onclick="openForm('license')"><span class="icon">💳</span><h3>Вод. права</h3></div>
-            <div class="card" onclick="openForm('house')"><span class="icon">🏠</span><h3>Регистрация дома</h3></div>
-            <div class="card" onclick="openForm('accident')"><span class="icon">💥</span><h3>Регистрация ДТП</h3></div>
-            <div class="card" onclick="openForm('court')"><span class="icon">⚖️</span><h3>Подать в суд</h3></div>
-            <div class="card" onclick="openForm('marriage')"><span class="icon">💍</span><h3>ЗАГС</h3></div>
-            <div class="card" onclick="linkTelegram()" style="border-color: #24A1DE;"><span class="icon">✈️</span><h3>Telegram Уведомления</h3></div>
-            <div class="card" onclick="openForm('realty')"><span class="icon">🏗</span><h3>Недвижимость</h3></div>
-            <div class="card" onclick="openForm('rules')"><span class="icon">📜</span><h3>Правила</h3></div>
+        <div class="container">
+            <div class="grid">
+                <div class="card" onclick="openForm('car')"><span class="icon">🚗</span><h3>Регистрация авто</h3></div>
+                <div class="card" onclick="openForm('id')"><span class="icon">🪪</span><h3>ID-карта</h3></div>
+                <div class="card" onclick="openForm('license')"><span class="icon">💳</span><h3>Вод. права</h3></div>
+                <div class="card" onclick="openForm('house')"><span class="icon">🏠</span><h3>Регистрация дома</h3></div>
+                <div class="card" onclick="openForm('accident')"><span class="icon">💥</span><h3>Регистрация ДТП</h3></div>
+                <div class="card" onclick="openForm('court')"><span class="icon">⚖️</span><h3>Подать в суд</h3></div>
+                <div class="card" onclick="openForm('marriage')"><span class="icon">💍</span><h3>ЗАГС</h3></div>
+                <div class="card" onclick="linkTelegram()" style="border-color: #24A1DE;"><span class="icon">✈️</span><h3>Telegram</h3></div>
+                <div class="card" onclick="openForm('realty')"><span class="icon">🏗</span><h3>Недвижимость</h3></div>
+                <div class="card" onclick="openForm('rules')"><span class="icon">📜</span><h3>Правила</h3></div>
+            </div>
         </div>
     </div>
 
     <div id="tg-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
         <div class="auth-card" style="position: relative; max-width: 400px;">
             <span onclick="document.getElementById('tg-modal').style.display='none'" style="position: absolute; right: 20px; top: 10px; cursor: pointer; font-size: 24px;">&times;</span>
-            <h2>✈️ Настройка уведомлений</h2>
-            <p style="font-size: 14px; color: #ccc; margin-bottom: 15px;">
-                1. Узнайте свой ID у бота <a href="https://t.me/userinfobot" target="_blank" style="color: #24A1DE;">@userinfobot</a><br>
-                2. Введите его ниже для вашего ника.
-            </p>
-            <input type="text" id="tg-id-input" placeholder="Ваш Telegram ID (цифры)">
+            <h2>✈️ Уведомления</h2>
+            <input type="text" id="tg-id-input" placeholder="Ваш Telegram ID">
             <button onclick="saveTgId()" class="btn-main">Привязать</button>
         </div>
     </div>
