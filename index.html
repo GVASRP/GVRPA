@@ -35,8 +35,14 @@
         <nav class="navbar">
             <div class="nav-logo">🏛 КальтУслуги</div>
             <div class="nav-user">
-                <span id="user-display">Загрузка...</span>
-                <button onclick="logout()" class="btn-exit">Выход</button>
+    <span id="user-display">Загрузка...</span>
+    
+    <div id="nav-controls" style="display: inline-flex; gap: 8px; margin: 0 15px;">
+        <button onclick="location.href='profile.html'" class="btn-nav-small">📂 Мои заявки</button>
+        </div>
+
+    <button onclick="logout()" class="btn-exit">Выход</button>
+</div>
             </div>
         </nav>
 
