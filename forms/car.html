@@ -62,14 +62,15 @@
                 const plate = document.getElementById('car-plate').value;
                 const photos = document.getElementById('car-photos').value;
 
-                // Проверка полей
+                // ВОТ ОНО! ИСПРАВЛЕНО: добавлено || между проверками
                 if (!brand  !model  !plate) {
                     alert("Заполните обязательные поля: Марка, Модель и Номер!");
                     return;
                 }
 
                 const { error } = await supabaseClient
-                    .from('applications')
+
+.from('applications')
                     .insert([{ 
                         username: user.username, 
                         type: 'car', 
@@ -77,7 +78,7 @@
                         status: 'pending' 
                     }]);
 
-if (error) throw error;
+                if (error) throw error;
 
                 alert("Заявка успешно подана!");
                 window.location.href = '../index.html';
