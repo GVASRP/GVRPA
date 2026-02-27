@@ -6,67 +6,91 @@
     <title>ID-Карта | КальтУслуги</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="../style.css">
+    <style>
+        /* Дополнительные стили специально для длинной анкеты */
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #aaa;
+            text-align: left;
+        }
+        textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px;
+            box-sizing: border-box;
+        }
+        select {
+            cursor: pointer;
+        }
+    </style>
 </head>
-<body style="display: block; padding: 40px 20px;">
+<body>
 
-    <div class="auth-card" style="max-width: 600px; margin: 0 auto;">
-        <h1>🪪 АНКЕТА ID-КАРТЫ</h1>
-        <p class="subtitle">Пожалуйста, заполните все 11 пунктов анкеты</p>
+    <div id="auth-screen" style="display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 40px 20px;">
+        <div class="auth-card" style="max-width: 600px; width: 100%;">
+            <h1>🪪 АНКЕТА ID-КАРТЫ</h1>
+            <p class="subtitle">Пожалуйста, заполните все 11 пунктов анкеты</p>
 
-        <div id="id-form" style="text-align: left;">
-            <label>1. Ник в Roblox:</label>
-            <input type="text" id="p1" placeholder="Nick_Name">
+            <div id="login-box">
+                <label>1. Ник в Roblox:</label>
+                <input type="text" id="p1" placeholder="Nick_Name">
 
-            <label>2. Ник в ТГ:</label>
-            <input type="text" id="p2" placeholder="@username">
+                <label>2. Ник в ТГ:</label>
+                <input type="text" id="p2" placeholder="@username">
 
-            <label>3. Биография персонажа:</label>
-            <textarea id="p3" rows="4" placeholder="История вашего героя..."></textarea>
+                <label>3. Биография персонажа:</label>
+                <textarea id="p3" rows="4" placeholder="История вашего героя..."></textarea>
 
-            <label>4. Что такое РП (RolePlay)?</label>
-            <input type="text" id="p4" placeholder="Ваш ответ">
+                <label>4. Что такое РП (RolePlay)?</label>
+                <input type="text" id="p4" placeholder="Ваш ответ">
 
-            <label>5. Что такое Нон-РП?</label>
-            <input type="text" id="p5" placeholder="Ваш ответ">
+                <label>5. Что такое Нон-РП?</label>
+                <input type="text" id="p5" placeholder="Ваш ответ">
 
-            <label>6. ФИО персонажа:</label>
-            <input type="text" id="p6" placeholder="Иванов Иван Иванович">
+                <label>6. ФИО персонажа:</label>
+                <input type="text" id="p6" placeholder="Иванов Иван Иванович">
 
-            <label>7. Фото вашего персонажа (ссылка):</label>
-            <input type="text" id="p7" placeholder="https://imgur.com/...">
+                <label>7. Фото вашего персонажа (ссылка):</label>
+                <input type="text" id="p7" placeholder="https://imgur.com/...">
 
-            <label>8. Имеются ли родные/друзья? (зарегистрированные):</label>
-            <input type="text" id="p8" placeholder="Да/Нет">
+                <label>8. Имеются ли родные/друзья?</label>
+                <input type="text" id="p8" placeholder="Да/Нет">
 
-            <label>9. ФИО и юзы знакомых вашего персонажа:</label>
-            <input type="text" id="p9" placeholder="Список имен и @">
+                <label>9. ФИО и юзы знакомых:</label>
+                <input type="text" id="p9" placeholder="Список имен и @">
 
-            <label>10. Возраст персонажа:</label>
-            <input type="number" id="p10" placeholder="Например: 25">
+                <label>10. Возраст персонажа:</label>
+                <input type="number" id="p10" placeholder="Например: 25">
 
-            <label>11. Пол персонажа:</label>
-            <select id="p11" style="width:100%; padding:12px; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:12px; margin:10px 0;">
-                <option value="Мужской" style="background:#1a1425;">Мужской</option>
-                <option value="Женский" style="background:#1a1425;">Женский</option>
-            </select>
+                <label>11. Пол персонажа:</label>
+                <select id="p11" style="width:100%; padding:12px; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:12px; margin-bottom: 10px;">
+                    <option value="Мужской" style="background:#1a1425;">Мужской</option>
+                    <option value="Женский" style="background:#1a1425;">Женский</option>
+                </select>
 
-            <button onclick="sendIdApp()" class="btn-main" style="margin-top: 20px;">Отправить на проверку</button>
-            <button onclick="location.href='../index.html'" class="btn-exit" style="width: 100%; margin-top: 10px; border: none;">Вернуться назад</button>
+                <button onclick="sendIdApp()" class="btn-main" style="margin-top: 20px;">Отправить на проверку</button>
+                <button onclick="location.href='../index.html'" class="btn-exit" style="width: 100%; margin-top: 10px;">Вернуться назад</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // ВСТАВЬ СВОИ КЛЮЧИ ТУТ
         const SUPABASE_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         async function sendIdApp() {
-            const user = JSON.parse(localStorage.getItem('gvr_user'));
-            if(!user) return alert("Вы не вошли!");
+            const savedUser = localStorage.getItem('gvr_user');
+            if(!savedUser) return alert("Вы не вошли!");
+            const user = JSON.parse(savedUser);
 
-            // Собираем данные в один объект
-            const formData = {
+const formData = {
                 roblox_nick: document.getElementById('p1').value,
                 tg_nick: document.getElementById('p2').value,
                 bio: document.getElementById('p3').value,
@@ -80,10 +104,9 @@
                 gender: document.getElementById('p11').value
             };
 
-            // Проверка на пустые поля
             if(!formData.roblox_nick || !formData.full_name) return alert("Заполните основные поля!");
 
-const { error } = await supabaseClient
+            const { error } = await supabaseClient
                 .from('applications')
                 .insert([{ 
                     username: user.username, 
@@ -94,7 +117,7 @@ const { error } = await supabaseClient
 
             if (error) alert("Ошибка: " + error.message);
             else {
-                alert("Анкета отправлена! Ожидайте одобрения.");
+                alert("Анкета отправлена!");
                 window.location.href = '../index.html';
             }
         }
