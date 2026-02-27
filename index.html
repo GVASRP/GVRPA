@@ -147,5 +147,103 @@
     </div>
 
     <script src="script.js"></script>
+       <script>
+        const SUPABASE_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Переключение между Входом и Регистрацией
+        function showReg(show) {
+            const lBox = document.getElementById('login-box');
+            const rBox = document.getElementById('reg-box');
+            if (lBox && rBox) {
+                lBox.style.display = show ? 'none' : 'block';
+                rBox.style.display = show ? 'block' : 'none';
+            }
+        }
+
+        // Логика регистрации
+        async function register() {
+            const nick = document.getElementById('reg-nick').value;
+            const pass = document.getElementById('reg-pass').value;
+            const tg = document.getElementById('reg-tg').value;
+
+            if (!nick || !pass) return alert("Введите ник и пароль!");
+
+            const { error } = await supabaseClient
+                .from('profiles')
+                .insert([{ username: nick, password: pass, telegram: tg, role: 'user' }]);
+
+            if (error) {
+                alert("Ошибка: " + error.message);
+            } else {
+                alert("Регистрация успешна! Теперь вы можете войти.");
+                showReg(false);
+            }
+        }
+
+        // Логика входа
+        async function login() {
+            const nick = document.getElementById('login-nick').value;
+            const pass = document.getElementById('login-pass').value;
+
+            if (!nick || !pass) return alert("Введите ник и пароль!");
+
+            const { data, error } = await supabaseClient
+                .from('profiles')
+                .select('*')
+                .eq('username', nick)
+                .eq('password', pass)
+                .single();
+
+            if (data) {
+                localStorage.setItem('gvr_user', JSON.stringify(data));
+                renderMain(data);
+            } else {
+                alert("Ошибка: Неверный ник или пароль!");
+            }
+        }
+
+        // Показ главного экрана после входа
+        function renderMain(user) {
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('main-screen').style.display = 'block';
+            document.getElementById('user-display').innerText = user.username;
+
+            // Проверка ролей для админ-кнопок
+            const policeTile = document.getElementById('police-tile');
+            const adminLink = document.getElementById('admin-link');
+
+            if (policeTile) {
+                policeTile.style.display = (user.role === 'admin' || user.role === 'police') ? 'block' : 'none';
+            }
+            if (adminLink) {
+                adminLink.style.display = (user.role === 'admin') ? 'inline' : 'none';
+            }
+        }
+
+        // Выход из системы
+        function logout() {
+            localStorage.removeItem('gvr_user');
+            location.reload();
+        }
+
+        // Открытие анкет
+        function openForm(type) {
+            window.location.href = 'forms/' + type + '.html';
+        }
+
+        // Авто-вход, если данные сохранены
+        window.onload = () => {
+            const saved = localStorage.getItem('gvr_user');
+            if (saved) {
+                try {
+                    renderMain(JSON.parse(saved));
+                } catch (e) {
+                    localStorage.removeItem('gvr_user');
+                }
+            }
+        };
+    </script> 
 </body>
     </html>
