@@ -1,3 +1,4 @@
+На Рыбалке, [27.02.2026 15:35]
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -6,41 +7,71 @@
     <title>Судебный Иск | КальтУслуги</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="../style.css">
+    <style>
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #aaa;
+            text-align: left;
+        }
+        textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        h3 {
+            margin-top: 25px;
+            color: #8b5cf6; /* Цвет акцента, если переменная не сработает */
+            border-bottom: 1px solid rgba(139, 92, 246, 0.3);
+            padding-bottom: 5px;
+            font-size: 18px;
+            text-align: left;
+        }
+    </style>
 </head>
-<body style="display: block; padding: 40px 20px;">
+<body>
 
-    <div class="auth-card" style="max-width: 700px; margin: 0 auto;">
-        <h1>⚖️ СУДЕБНЫЙ ИСК</h1>
-        <p class="subtitle">Подача официального заявления в Верховный Суд GVRPA</p>
+    <div id="auth-screen" style="display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 40px 20px;">
+        <div class="auth-card" style="max-width: 700px; width: 100%;">
+            <h1>⚖️ СУДЕБНЫЙ ИСК</h1>
+            <p class="subtitle">Подача официального заявления в Верховный Суд GVRPA</p>
 
-        <div id="court-form" style="text-align: left;">
-            <h3 style="color: var(--accent-purple); border-bottom: 1px solid rgba(139, 92, 246, 0.3); padding-bottom: 5px;">Стороны процесса</h3>
-            
-            <label>1. Истец (Ваше ФИО и Ник в Roblox, а так же @ в телеграмм):</label>
-            <input type="text" id="court-plaintiff" placeholder="Иван Иванов | Nick_Name">
+            <div id="login-box">
+                <h3>Стороны процесса</h3>
+                
+                <label>1. Истец (ФИО, Ник в Roblox и @Telegram):</label>
+                <input type="text" id="court-plaintiff" placeholder="Иван Иванов | Nick_Name | @tg">
 
-            <label>2. Ответчик (Ник того, на кого подаете):</label>
-            <input type="text" id="court-defendant" placeholder="Nick_Name ответчика">
+                <label>2. Ответчик (Ник того, на кого подаете):</label>
+                <input type="text" id="court-defendant" placeholder="Nick_Name ответчика">
 
-            <h3 style="margin-top: 25px; color: var(--accent-purple); border-bottom: 1px solid rgba(139, 92, 246, 0.3); padding-bottom: 5px;">Суть обращения</h3>
+                <h3>Суть обращения</h3>
 
-            <label>3. Нарушенные статьи (если известны):</label>
-            <input type="text" id="court-law" placeholder="Например: 1.2 УК, 4.5 КоАП">
+                <label>3. Нарушенные статьи (если известны):</label>
+                <input type="text" id="court-law" placeholder="Например: 1.2 УК, 4.5 КоАП">
 
-            <label>4. Описание ситуации (Расскажите подробно, что произошло):</label>
-            <textarea id="court-reason" rows="6" placeholder="Число, время, действия ответчика..."></textarea>
+                <label>4. Описание ситуации (подробно):</label>
+                <textarea id="court-reason" rows="6" placeholder="Число, время, действия ответчика..."></textarea>
 
-            <label>5. Ваши требования (Чего вы хотите добиться?):</label>
-            <textarea id="court-demands" rows="3" placeholder="Выплата компенсации, арест, увольнение..."></textarea>
+                <label>5. Ваши требования:</label>
+                <textarea id="court-demands" rows="3" placeholder="Выплата компенсации, арест, увольнение..."></textarea>
 
-            <label>6. Доказательства (Ссылки на видео, скрины):</label>
-            <textarea id="court-evidence" rows="2" placeholder="https://youtube.com/... или https://imgur.com/..."></textarea>
+                <label>6. Доказательства (Ссылки):</label>
+                <textarea id="court-evidence" rows="2" placeholder="https://youtube.com/..."></textarea>
 
-            <label>7. Имеются ли свидетели? (Укажите ники):</label>
-            <input type="text" id="court-witnesses" placeholder="Nick_Name свидетелей через запятую">
+                <label>7. Имеются ли свидетели? (Ники):</label>
+                <input type="text" id="court-witnesses" placeholder="Nick_Name свидетелей через запятую">
 
-            <button onclick="sendCourtApp()" class="btn-main" style="margin-top: 20px;">Подать иск в суд</button>
-            <button onclick="location.href='../index.html'" class="btn-exit" style="width: 100%; margin-top: 10px; border: none;">Отозвать иск</button>
+                <button onclick="sendCourtApp()" class="btn-main" style="margin-top: 25px;">Подать иск в суд</button>
+                <button onclick="location.href='../index.html'" class="btn-exit" style="width: 100%; margin-top: 10px;">Вернуться назад</button>
+            </div>
         </div>
     </div>
 
@@ -50,12 +81,15 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         async function sendCourtApp() {
-            const user = JSON.parse(localStorage.getItem('gvr_user'));
-            if(!user) return alert("Вы не вошли!");
+            const saved = localStorage.getItem('gvr_user');
+            if(!saved) return alert("Вы не вошли!");
+            const user = JSON.parse(saved);
 
             const formData = {
                 plaintiff: document.getElementById('court-plaintiff').value,
-                defendant: document.getElementById('court-defendant').value,
+
+На Рыбалке, [27.02.2026 15:35]
+defendant: document.getElementById('court-defendant').value,
                 violated_laws: document.getElementById('court-law').value,
                 situation: document.getElementById('court-reason').value,
                 demands: document.getElementById('court-demands').value,
@@ -63,8 +97,9 @@
                 witnesses: document.getElementById('court-witnesses').value
             };
 
+            // ИСПРАВЛЕНО: Добавлены операторы ||
             if(!formData.plaintiff  !formData.defendant  !formData.situation || !formData.evidence) {
-                return alert("Иск отклонен: Не заполнены обязательные поля (Истец, Ответчик, Суть, Улики)!");
+                return alert("Иск отклонен: Не заполнены обязательные поля!");
             }
 
             const { error } = await supabaseClient
@@ -75,10 +110,10 @@
                     data: formData, 
                     status: 'pending' 
                 }]);
-]
-if (error) alert("Ошибка: " + error.message);
+
+            if (error) alert("Ошибка: " + error.message);
             else {
-                alert("Исковое заявление №" + Math.floor(Math.random() * 1000) + " успешно подано и ожидает рассмотрения Судьёй!");
+                alert("Исковое заявление успешно подано!");
                 window.location.href = '../index.html';
             }
         }
