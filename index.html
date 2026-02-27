@@ -1,24 +1,181 @@
-<div id="main-screen">
-    <nav class="navbar">
-        <div class="nav-logo">🏛 КальтУслуги</div>
-        <div class="nav-user">
-            <span id="user-display" style="color: #a0a0a0;">Загрузка...</span>
-            <a id="admin-link" href="admin.html" style="display: none; color: #ef4444; text-decoration: none; font-weight: bold;">Панель</a>
-            <button onclick="location.href='profile.html'" class="btn-profile">📂 Мои заявки</button>
-            <button onclick="logout()" class="btn-exit">Выход</button>
-        </div>
-    </nav>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>КальтУслуги | GVRPA</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* ОСНОВНОЙ СТИЛЬ */
+        body {
+            background-color: #0a0a0a !important;
+            color: white !important;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
 
-    <div class="grid">
-        <div class="card" onclick="openForm('car')"><span class="icon">🚗</span><h3>Регистрация авто</h3></div>
-        <div class="card" onclick="openForm('id')"><span class="icon">🪪</span><h3>ID-карта</h3></div>
-        <div class="card" onclick="openForm('license')"><span class="icon">💳</span><h3>Вод. права</h3></div>
-        <div class="card" onclick="openForm('house')"><span class="icon">🏠</span><h3>Регистрация дома</h3></div>
-        <div class="card" onclick="openForm('accident')"><span class="icon">💥</span><h3>Регистрация ДТП</h3></div>
-        <div class="card" onclick="openForm('court')"><span class="icon">⚖️</span><h3>Подать в суд</h3></div>
-        <div class="card" onclick="openForm('marriage')"><span class="icon">💍</span><h3>ЗАГС</h3></div>
-        <div class="card" onclick="linkTelegram()" style="border-color: #24A1DE;"><span class="icon">✈️</span><h3>Telegram</h3></div>
-        <div class="card" onclick="openForm('realty')"><span class="icon">🏗</span><h3>Недвижимость</h3></div>
-        <div class="card" onclick="openForm('rules')"><span class="icon">📜</span><h3>Правила</h3></div>
+        /* ШАПКА ПО ЦЕНТРУ */
+        .navbar {
+            background: #141414;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #262626;
+            margin-bottom: 30px;
+        }
+
+        .nav-logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #8b5cf6;
+        }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* КНОПКИ */
+        .btn-profile {
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-exit {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* СЕТКА ПЛИТОК (ЦЕНТРИРОВАННАЯ) */
+        .grid-wrapper {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, 250px);
+            gap: 20px;
+            width: 90%;
+            max-width: 1200px;
+            justify-content: center;
+        }
+
+        .card {
+            background: #141414;
+            border: 1px solid #262626;
+            border-radius: 20px;
+            padding: 30px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            border-color: #8b5cf6;
+            transform: translateY(-5px);
+        }
+
+        .icon {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        h3 { margin: 0; font-size: 16px; }
+
+        /* ЭКРАН ВХОДА */
+        #auth-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .auth-card {
+            background: #141414;
+            padding: 40px;
+            border-radius: 25px;
+            border: 1px solid #262626;
+            width: 320px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background: #000;
+            border: 1px solid #262626;
+            border-radius: 10px;
+            color: white;
+            box-sizing: border-box;
+        }
+
+        .btn-main {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="auth-screen">
+        <div class="auth-card">
+            <h1 style="color: #8b5cf6; margin: 0;">🏛 GVRPA</h1>
+            <p style="color: #a0a0a0; margin-bottom: 20px;">КальтУслуги</p>
+            <input type="text" id="login-nick" placeholder="Ник в Roblox">
+            <input type="password" id="login-pass" placeholder="Пароль">
+            <button onclick="login()" class="btn-main">Войти</button>
+        </div>
     </div>
-</div>
+
+    <div id="main-screen" style="display: none;">
+        <nav class="navbar">
+            <div class="nav-logo">🏛 КальтУслуги</div>
+            <div class="nav-user">
+                <span id="user-display" style="color: #a0a0a0;">...</span>
+                <a id="admin-link" href="admin.html" style="display: none; color: #ef4444; font-weight: bold; text-decoration: none;">Панель</a>
+                <button onclick="location.href='profile.html'" class="btn-profile">📂 Мои заявки</button>
+                <button onclick="logout()" class="btn-exit">Выход</button>
+            </div>
+        </nav>
+
+        <div class="grid-wrapper">
+            <div class="grid">
+                <div class="card" onclick="openForm('car')"><span class="icon">🚗</span><h3>Регистрация авто</h3></div>
+                <div class="card" onclick="openForm('id')"><span class="icon">🪪</span><h3>ID-карта</h3></div>
+                <div class="card" onclick="openForm('license')"><span class="icon">💳</span><h3>Вод. права</h3></div>
+                <div class="card" onclick="openForm('house')"><span class="icon">🏠</span><h3>Регистрация дома</h3></div>
+                <div class="card" onclick="openForm('accident')"><span class="icon">💥</span><h3>Регистрация ДТП</h3></div>
+                <div class="card" onclick="openForm('court')"><span class="icon">⚖️</span><h3>Подать в суд</h3></div>
+                <div class="card" onclick="openForm('marriage')"><span class="icon">💍</span><h3>ЗАГС</h3></div>
+                <div class="card" onclick="linkTelegram()"><span class="icon">✈️</span><h3>Telegram</h3></div>
+                <div class="card" onclick="openForm('realty')"><span class="icon">🏗</span><h3>Недвижимость</h3></div>
+                <div class="card" onclick="openForm('rules')"><span class="icon">📜</span><h3>Правила</h3></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+    </html>
