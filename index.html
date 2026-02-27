@@ -89,14 +89,30 @@
 <body>
 
     <div id="auth-screen">
-        <div class="auth-card">
-            <h1 style="color: #8b5cf6; margin: 0;">🏛 GVRPA</h1>
-            <p style="color: #a0a0a0;">КальтУслуги</p>
-            <input type="text" id="login-nick" placeholder="Ник в Roblox">
-            <input type="password" id="login-pass" placeholder="Пароль">
-            <button onclick="login()" class="btn-main">Войти</button>
-        </div>
+       <div class="auth-card">
+    <h1 style="color: #8b5cf6; margin: 0;">🏛 GVRPA</h1>
+    <p style="color: #a0a0a0;">КальтУслуги</p>
+
+    <div id="login-box">
+        <input type="text" id="login-nick" placeholder="Ник в Roblox">
+        <input type="password" id="login-pass" placeholder="Пароль">
+        <button onclick="login()" class="btn-main">Войти</button>
+        <p style="font-size: 13px; color: #666; margin-top: 15px;">
+            Нет аккаунта? <a href="#" onclick="showReg(true)" style="color: #8b5cf6;">Создать</a>
+        </p>
     </div>
+
+    <div id="reg-box" style="display: none;">
+        <input type="text" id="reg-nick" placeholder="Ник в Roblox">
+        <input type="password" id="reg-pass" placeholder="Придумайте пароль">
+        <input type="text" id="reg-tg" placeholder="Ваш Telegram (необязательно)">
+        <button onclick="register()" class="btn-main">Зарегистрироваться</button>
+        <p style="font-size: 13px; color: #666; margin-top: 15px;">
+            Уже есть аккаунт? <a href="#" onclick="showReg(false)" style="color: #8b5cf6;">Войти</a>
+        </p>
+    </div>
+</div>
+
 
     <div id="main-screen" style="display: none; width: 100%;">
         <div class="main-wrapper">
