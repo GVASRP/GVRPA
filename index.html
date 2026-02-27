@@ -3,191 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>КальтУслуги | GVRPA</title>
+    <title>GVRPA | КальтУслуги</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <style>
-        /* 1. Центрируем всё на странице */
-        body {
-            background-color: #0a0a0a !important;
-            color: white !important;
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Это центрирует всё по горизонтали */
+        :root {
+            --bg: #0a0a0a;
+            --card-bg: #141414;
+            --accent: #8b5cf6;
+            --border: #262626;
+        }
+        body { 
+            background: var(--bg); 
+            color: white; 
+            font-family: 'Segoe UI', sans-serif; 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
             min-height: 100vh;
         }
-
-        /* 2. Общая колонка (Шапка + Плитки) */
-        .main-wrapper {
+        .auth-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 30px;
+            border-radius: 20px;
             width: 100%;
-            max-width: 1000px; /* Ограничиваем ширину, чтобы не расползалось */
-            display: flex;
+            max-width: 350px;
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: white;
+            box-sizing: border-box;
+        }
+        .btn-main {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        #main-screen {
+            display: none;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
-            box-sizing: border-box;
         }
-
-        /* 3. Полоска навигации */
-        .navbar {
-            width: 100%;
-            background-color: #141414;
-            border: 1px solid #262626;
-            border-radius: 15px;
-            padding: 12px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            box-sizing: border-box;
-        }
-
-        /* 4. Сетка плиток */
-        .grid {
+        .tile-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            width: 100%;
-            justify-content: center; /* Центрирует плитки внутри сетки */
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
         }
-
-        /* 5. Карточки-плитки */
-        .card {
-            background: #141414;
-            border: 1px solid #262626;
-            border-radius: 20px;
-            padding: 30px;
-            text-align: center;
+        .tile {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 15px;
             cursor: pointer;
-            transition: 0.3s;
+            text-align: center;
         }
-
-        .card:hover {
-            border-color: #8b5cf6;
-            transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.2);
-        }
-
-        /* Стили текста и кнопок */
-        .nav-logo { font-size: 20px; font-weight: bold; color: #8b5cf6; }
-        .nav-user { display: flex; align-items: center; gap: 15px; }
-        .btn-profile { background: #8b5cf6; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .btn-exit { background: #333; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
-        .icon { font-size: 40px; display: block; margin-bottom: 10px; }
-        h3 { margin: 0; font-size: 16px; }
-
-        /* Экран входа */
-        #auth-screen { display: flex; justify-content: center; align-items: center; height: 100vh; width: 100%; }
-        .auth-card { background: #141414; padding: 40px; border-radius: 25px; border: 1px solid #262626; width: 320px; text-align: center; }
-        input { width: 100%; padding: 12px; margin-top: 10px; background: #000; border: 1px solid #262626; border-radius: 10px; color: white; box-sizing: border-box; }
-        .btn-main { width: 100%; padding: 12px; margin-top: 20px; background: #8b5cf6; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="auth-screen">
-       <div class="auth-card">
-    <h1 style="color: #8b5cf6; margin: 0;">🏛 GVRPA</h1>
-    <p style="color: #a0a0a0;">КальтУслуги</p>
+        <div class="auth-card">
+            <h1 style="color: var(--accent); margin-bottom: 5px;">🏛 GVRPA</h1>
+            <p style="color: #666; margin-bottom: 25px;">КальтУслуги</p>
 
-    <div id="login-box">
-        <input type="text" id="login-nick" placeholder="Ник в Roblox">
-        <input type="password" id="login-pass" placeholder="Пароль">
-        <button onclick="login()" class="btn-main">Войти</button>
-        <p style="font-size: 13px; color: #666; margin-top: 15px;">
-            Нет аккаунта? <a href="#" onclick="showReg(true)" style="color: #8b5cf6;">Создать</a>
-        </p>
-    </div>
-
-    <div id="reg-box" style="display: none;">
-        <input type="text" id="reg-nick" placeholder="Ник в Roblox">
-        <input type="password" id="reg-pass" placeholder="Придумайте пароль">
-        <input type="text" id="reg-tg" placeholder="Ваш Telegram (необязательно)">
-        <button onclick="register()" class="btn-main">Зарегистрироваться</button>
-        <p style="font-size: 13px; color: #666; margin-top: 15px;">
-            Уже есть аккаунт? <a href="#" onclick="showReg(false)" style="color: #8b5cf6;">Войти</a>
-        </p>
-    </div>
-</div>
-
-
-    <div id="main-screen" style="display: none; width: 100%;">
-        <div class="main-wrapper">
-            
-            <nav class="navbar">
-                <div class="nav-logo">🏛 КальтУслуги</div>
-                <div class="nav-user">
-                    <span id="user-display" style="color: #a0a0a0;">Загрузка...</span>
-                    <a id="admin-link" href="admin.html" style="display: none; color: #ef4444; font-weight: bold; text-decoration: none;">Панель</a>
-                    <button onclick="location.href='profile.html'" class="btn-profile">📂 Мои заявки</button>
-                    <button onclick="logout()" class="btn-exit">Выход</button>
-                </div>
-            </nav>
-
-            <div class="grid">
-                <div class="card" onclick="openForm('car')"><span class="icon">🚗</span><h3>Регистрация авто</h3></div>
-                <div class="card" onclick="openForm('id')"><span class="icon">🪪</span><h3>ID-карта</h3></div>
-                <div class="card" onclick="openForm('license')"><span class="icon">💳</span><h3>Вод. права</h3></div>
-                <div class="card" onclick="openForm('house')"><span class="icon">🏠</span><h3>Регистрация дома</h3></div>
-                <div class="card" onclick="openForm('accident')"><span class="icon">💥</span><h3>Регистрация ДТП</h3></div>
-                <div class="card" onclick="openForm('court')"><span class="icon">⚖️</span><h3>Подать в суд</h3></div>
-                <div class="card" onclick="openForm('marriage')"><span class="icon">💍</span><h3>ЗАГС</h3></div>
-                <div class="card" onclick="linkTelegram()"><span class="icon">✈️</span><h3>Telegram</h3></div>
-                <div class="card" onclick="openForm('realty')"><span class="icon">🏗</span><h3>Недвижимость</h3></div>
-                <div class="card" onclick="openForm('rules')"><span class="icon">📜</span><h3>Правила</h3></div>
-                <div id="police-tile" class="card" style="display: none; border-color: #ef4444;" onclick="location.href='police.html'"><span class="icon">🚔</span><h3>База данных</h3>
-</div>
-
+            <div id="login-box">
+                <input type="text" id="login-nick" placeholder="Ник в Roblox">
+                <input type="password" id="login-pass" placeholder="Пароль">
+                <button onclick="login()" class="btn-main">Войти</button>
+                <p style="font-size: 13px; margin-top: 15px;">Нет аккаунта? <a href="javascript:void(0)" onclick="showReg(true)" style="color: var(--accent);">Создать</a></p>
             </div>
 
+            <div id="reg-box" style="display: none;">
+                <input type="text" id="reg-nick" placeholder="Новый ник Roblox">
+                <input type="password" id="reg-pass" placeholder="Придумайте пароль">
+                <input type="text" id="reg-tg" placeholder="Ваш Telegram">
+                <button onclick="register()" class="btn-main">Зарегистрироваться</button>
+                <p style="font-size: 13px; margin-top: 15px;">Уже есть аккаунт? <a href="javascript:void(0)" onclick="showReg(false)" style="color: var(--accent);">Войти</a></p>
+            </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
-       <script>
+    <div id="main-screen">
+        <h2>Добро пожаловать, <span id="user-display">---</span>!</h2>
+        <div class="tile-grid">
+            <div class="tile" onclick="openForm('id')">🪪 ID-Карта</div>
+            <div class="tile" onclick="openForm('license')">💳 Права</div>
+            <div class="tile" id="police-tile" style="display:none; border-color: #3b82f6;" onclick="location.href='police.html'">🚔 МВД</div>
+            <div class="tile" id="admin-link" style="display:none; border-color: #ef4444;" onclick="location.href='admin.html'">🛠 Админка</div>
+        </div>
+        <button onclick="logout()" style="margin-top: 30px; background: none; border: 1px solid #333; color: #666; padding: 10px 20px; border-radius: 10px; cursor: pointer;">Выйти</button>
+    </div>
+
+    <script>
         const SUPABASE_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Переключение между Входом и Регистрацией
         function showReg(show) {
-            const lBox = document.getElementById('login-box');
-            const rBox = document.getElementById('reg-box');
-            if (lBox && rBox) {
-                lBox.style.display = show ? 'none' : 'block';
-                rBox.style.display = show ? 'block' : 'none';
-            }
+            document.getElementById('login-box').style.display = show ? 'none' : 'block';
+            document.getElementById('reg-box').style.display = show ? 'block' : 'none';
         }
 
-        // Логика регистрации
         async function register() {
-            const nick = document.getElementById('reg-nick').value;
-            const pass = document.getElementById('reg-pass').value;
-            const tg = document.getElementById('reg-tg').value;
+            const nick = document.getElementById('reg-nick').value.trim();
+            const pass = document.getElementById('reg-pass').value.trim();
+            const tg = document.getElementById('reg-tg').value.trim();
 
-            if (!nick || !pass) return alert("Введите ник и пароль!");
+            if (!nick || !pass) return alert("Заполните ник и пароль!");
 
             const { error } = await supabaseClient
                 .from('profiles')
                 .insert([{ username: nick, password: pass, telegram: tg, role: 'user' }]);
 
-            if (error) {
-                alert("Ошибка: " + error.message);
-            } else {
-                alert("Регистрация успешна! Теперь вы можете войти.");
-                showReg(false);
-            }
+            if (error) alert("Ошибка регистрации: " + error.message);
+            else { alert("Успех! Теперь войдите."); showReg(false); }
         }
 
-        // Логика входа
         async function login() {
-            const nick = document.getElementById('login-nick').value;
-            const pass = document.getElementById('login-pass').value;
+            const nick = document.getElementById('login-nick').value.trim();
+            const pass = document.getElementById('login-pass').value.trim();
 
-            if (!nick || !pass) return alert("Введите ник и пароль!");
+            if (!nick || !pass) return alert("Введите данные!");
 
             const { data, error } = await supabaseClient
                 .from('profiles')
@@ -200,50 +150,36 @@
                 localStorage.setItem('gvr_user', JSON.stringify(data));
                 renderMain(data);
             } else {
-                alert("Ошибка: Неверный ник или пароль!");
+                alert("Неверный логин или пароль!");
             }
         }
 
-        // Показ главного экрана после входа
         function renderMain(user) {
             document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('main-screen').style.display = 'block';
+            document.getElementById('main-screen').style.display = 'flex';
             document.getElementById('user-display').innerText = user.username;
 
-            // Проверка ролей для админ-кнопок
-            const policeTile = document.getElementById('police-tile');
-            const adminLink = document.getElementById('admin-link');
-
-            if (policeTile) {
-                policeTile.style.display = (user.role === 'admin' || user.role === 'police') ? 'block' : 'none';
+            if (user.role === 'admin' || user.role === 'police') {
+                document.getElementById('police-tile').style.display = 'block';
             }
-            if (adminLink) {
-                adminLink.style.display = (user.role === 'admin') ? 'inline' : 'none';
+            if (user.role === 'admin') {
+                document.getElementById('admin-link').style.display = 'block';
             }
         }
 
-        // Выход из системы
+        function openForm(type) {
+            window.location.href = 'forms/' + type + '.html';
+        }
+
         function logout() {
             localStorage.removeItem('gvr_user');
             location.reload();
         }
 
-        // Открытие анкет
-        function openForm(type) {
-            window.location.href = 'forms/' + type + '.html';
-        }
-
-        // Авто-вход, если данные сохранены
         window.onload = () => {
             const saved = localStorage.getItem('gvr_user');
-            if (saved) {
-                try {
-                    renderMain(JSON.parse(saved));
-                } catch (e) {
-                    localStorage.removeItem('gvr_user');
-                }
-            }
+            if (saved) renderMain(JSON.parse(saved));
         };
-    </script> 
+    </script>
 </body>
-    </html>
+</html>
