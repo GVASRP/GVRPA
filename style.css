@@ -157,3 +157,19 @@ input:focus {
     border-radius: 8px;
     cursor: pointer;
 }
+.btn-profile {
+    background: #8b5cf6;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    margin-left: 10px;
+    transition: 0.3s;
+}
+
+.btn-profile:hover {
+    background: #7c3aed;
+    transform: translateY(-1px);
+}
