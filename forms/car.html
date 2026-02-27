@@ -30,7 +30,7 @@
                 <p style="text-align: left; font-size: 13px; margin-top: 15px; color: #aaa;">5. Фото авто (ссылки):</p>
                 <textarea id="car-photos" placeholder="https://imgur.com/..."></textarea>
                 
-                <button id="submit-btn" onclick="sendCarApplication()" class="btn-main">Подать заявку</button>
+                <button id="submit-btn" class="btn-main">Подать заявку</button>
                 <button onclick="location.href='../index.html'" class="btn-exit">Отмена</button>
             </div>
         </div>
@@ -41,6 +41,11 @@
         const SUPABASE_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Вешаем обработчик после загрузки DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('submit-btn').addEventListener('click', sendCarApplication);
+        });
 
         async function sendCarApplication() {
             try {
@@ -57,7 +62,7 @@
                 const plate = document.getElementById('car-plate').value;
                 const photos = document.getElementById('car-photos').value;
 
-                // Проверка полей (Используем || правильно!)
+                // Проверка полей
                 if (!brand  !model  !plate) {
                     alert("Заполните обязательные поля: Марка, Модель и Номер!");
                     return;
@@ -72,12 +77,12 @@
                         status: 'pending' 
                     }]);
 
-                if (error) throw error;
+if (error) throw error;
 
                 alert("Заявка успешно подана!");
                 window.location.href = '../index.html';
 
-} catch (err) {
+            } catch (err) {
                 console.error("Критическая ошибка:", err);
                 alert("Произошла ошибка при отправке: " + err.message);
             }
