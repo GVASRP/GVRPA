@@ -3,12 +3,15 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 function showReg(show) {
-    // Если на странице нет этих ID (например, в формах), код не сломается
     const loginBox = document.getElementById('login-box');
     const regBox = document.getElementById('reg-box');
-    if (loginBox && regBox) {
-        loginBox.style.display = show ? 'none' : 'block';
-        regBox.style.display = show ? 'block' : 'none';
+    
+    if (show) {
+        loginBox.style.display = 'none';
+        regBox.style.display = 'block';
+    } else {
+        loginBox.style.display = 'block';
+        regBox.style.display = 'none';
     }
 }
 
