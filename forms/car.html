@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация авто | КальтУслуги</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="../style.css"> </head>
+<body style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+
+    <div class="auth-card" style="max-width: 500px;">
+        <h1>🚗 РЕГИСТРАЦИЯ АВТО</h1>
+        <p class="subtitle">Заполните данные строго по шаблону</p>
+
+        <div id="car-form">
+            <input type="text" id="car-model" placeholder="Марка и модель (например: 2021 Audi R8)">
+            <input type="text" id="car-plate" placeholder="Желаемый номер (например: AAA-111)">
+            <input type="text" id="car-color" placeholder="Цвет кузова">
+            <textarea id="car-extra" rows="3" placeholder="Дополнительная информация (ссылки на скрины авто в вашем гараже)"></textarea>
+            
+            <button onclick="sendCarApp()" class="btn-main">Подать заявку</button>
+            <button onclick="location.href='../index.html'" class="btn-exit" style="width: 100%; margin-top: 10px; border: none;">Назад</button>
+        </div>
+    </div>
+
+    <script>
+        // Подключаем базу (замени ключи на свои!)
+        const supabaseClient = supabase.createClient('ТВОЙ_URL', 'ТВОЙ_KEY');
+
+        async function sendCarApp() {
+            const user = JSON.parse(localStorage.getItem('gvr_user'));
+            if(!user) return alert("Вы не авторизованы!");
+
+            const carData = {
+                model: document.getElementById('car-model').value,
+                plate: document.getElementById('car-plate').value,
+                color: document.getElementById('car-color').value,
+                extra: document.getElementById('car-extra').value
+            };
+
+            const { error } = await supabaseClient
+                .from('applications')
+                .insert([{ 
+                    username: user.username, 
+                    type: 'car', 
+                    data: carData, // Сохраняем как JSON объект
+                    status: 'pending' 
+                }]);
+
+            if (error) alert("Ошибка");
+            else {
+                alert("Заявка на авто отправлена!");
+                window.location.href = '../index.html';
+            }
+        }
+    </script>
+</body>
+</html>
