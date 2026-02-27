@@ -1,24 +1,24 @@
-<nav class="navbar">
-    <div class="nav-logo">🏛 КальтУслуги</div>
-    <div class="nav-user">
-        <span id="user-display">Загрузка...</span>
-        <a id="admin-link" href="admin.html" style="display: none; color: #ef4444; margin-right: 15px; text-decoration: none; font-weight: bold;">Панель</a>
-        
-        <button onclick="location.href='profile.html'" class="btn-profile">📂 Мои заявки</button>
-        
-        <button onclick="logout()" class="btn-exit">Выход</button>
-    </div>
-</nav>
+<div id="main-screen">
+    <nav class="navbar">
+        <div class="nav-logo">🏛 КальтУслуги</div>
+        <div class="nav-user">
+            <span id="user-display" style="color: #a0a0a0;">Загрузка...</span>
+            <a id="admin-link" href="admin.html" style="display: none; color: #ef4444; text-decoration: none; font-weight: bold;">Панель</a>
+            <button onclick="location.href='profile.html'" class="btn-profile">📂 Мои заявки</button>
+            <button onclick="logout()" class="btn-exit">Выход</button>
+        </div>
+    </nav>
 
-<div class="grid">
-    <div class="card" onclick="openForm('car')"><span class="icon">🚗</span><h3>Регистрация авто</h3></div>
-    <div class="card" onclick="openForm('id')"><span class="icon">🪪</span><h3>ID-карта</h3></div>
-    <div class="card" onclick="openForm('license')"><span class="icon">💳</span><h3>Вод. права</h3></div>
-    <div class="card" onclick="openForm('house')"><span class="icon">🏠</span><h3>Регистрация дома</h3></div>
-    <div class="card" onclick="openForm('accident')"><span class="icon">💥</span><h3>Регистрация ДТП</h3></div>
-    <div class="card" onclick="openForm('court')"><span class="icon">⚖️</span><h3>Подать в суд</h3></div>
-    <div class="card" onclick="openForm('marriage')"><span class="icon">💍</span><h3>ЗАГС</h3></div>
-    <div class="card" onclick="linkTelegram()" style="border-color: #24A1DE;"><span class="icon">✈️</span><h3>Telegram</h3></div>
-    <div class="card" onclick="openForm('realty')"><span class="icon">🏗</span><h3>Недвижимость</h3></div>
-    <div class="card" onclick="openForm('rules')"><span class="icon">📜</span><h3>Правила</h3></div>
+    <div class="grid">
+        <div class="card" onclick="openForm('car')"><span class="icon">🚗</span><h3>Регистрация авто</h3></div>
+        <div class="card" onclick="openForm('id')"><span class="icon">🪪</span><h3>ID-карта</h3></div>
+        <div class="card" onclick="openForm('license')"><span class="icon">💳</span><h3>Вод. права</h3></div>
+        <div class="card" onclick="openForm('house')"><span class="icon">🏠</span><h3>Регистрация дома</h3></div>
+        <div class="card" onclick="openForm('accident')"><span class="icon">💥</span><h3>Регистрация ДТП</h3></div>
+        <div class="card" onclick="openForm('court')"><span class="icon">⚖️</span><h3>Подать в суд</h3></div>
+        <div class="card" onclick="openForm('marriage')"><span class="icon">💍</span><h3>ЗАГС</h3></div>
+        <div class="card" onclick="linkTelegram()" style="border-color: #24A1DE;"><span class="icon">✈️</span><h3>Telegram</h3></div>
+        <div class="card" onclick="openForm('realty')"><span class="icon">🏗</span><h3>Недвижимость</h3></div>
+        <div class="card" onclick="openForm('rules')"><span class="icon">📜</span><h3>Правила</h3></div>
+    </div>
 </div>
