@@ -1,1 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация дома | КальтУслуги</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body style="display: block; padding: 40px 20px;">
 
+    <div class="auth-card" style="max-width: 500px; margin: 0 auto;">
+        <h1>🏠 РЕГИСТРАЦИЯ ДОМА</h1>
+        <p class="subtitle">Внесение вашего жилья в реестр прописки</p>
+
+        <div id="house-form" style="text-align: left;">
+            <label>1. Ник в Roblox:</label>
+            <input type="text" id="h-nick" placeholder="Nick_Name">
+
+            <label>2. Номер дома (House Number):</label>
+            <input type="number" id="h-num" placeholder="Например: 124">
+
+            <label>3. Район / Улица:</label>
+            <input type="text" id="h-street" placeholder="Например: Northwood St.">
+
+            <label>4. Количество комнат:</label>
+            <input type="number" id="h-rooms" placeholder="Например: 3">
+
+            <label>5. Фото дома (ссылка на скриншот):</label>
+            <input type="text" id="h-photo" placeholder="https://imgur.com/...">
+
+            <label>6. Кто еще проживает в доме? (Ники):</label>
+            <textarea id="h-people" rows="3" placeholder="Если живете один — ставьте прочерк"></textarea>
+
+            <button onclick="sendHouseApp()" class="btn-main" style="margin-top: 20px;">Зарегистрировать дом</button>
+            <button onclick="location.href='../index.html'" class="btn-exit" style="width: 100%; margin-top: 10px; border: none;">Назад</button>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function sendHouseApp() {
+            const user = JSON.parse(localStorage.getItem('gvr_user'));
+            if(!user) return alert("Вы не вошли в систему!");
+
+            const formData = {
+                roblox_nick: document.getElementById('h-nick').value,
+                house_number: document.getElementById('h-num').value,
+                street: document.getElementById('h-street').value,
+                rooms: document.getElementById('h-rooms').value,
+                photo: document.getElementById('h-photo').value,
+                residents: document.getElementById('h-people').value
+            };
+
+            if(!formData.house_number || !formData.street) {
+                return alert("Пожалуйста, укажите хотя бы номер дома и улицу!");
+            }
+
+            const { error } = await supabaseClient
+                .from('applications')
+                .insert([{ 
+                    username: user.username, 
+                    type: 'house', 
+                    data: formData, 
+                    status: 'pending' 
+                }]);
+
+            if (error) alert("Ошибка: " + error.message);
+            else {
+                alert("Заявка на регистрацию дома подана! Скоро он появится в вашей базе.");
+                window.location.href = '../index.html';
+            }
+        }
+    </script>
+</body>
+</html>
