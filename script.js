@@ -113,3 +113,14 @@ async function saveTgId() {
         document.getElementById('tg-modal').style.display = 'none';
     }
 }
+// Вставь это туда, где ты записываешь ник в #user-display
+const saved = localStorage.getItem('gvr_user');
+if (saved) {
+    const user = JSON.parse(saved);
+    document.getElementById('user-display').innerText = user.username;
+
+    // Если ты админ — показываем скрытую ссылку
+    if (user.role === 'admin') {
+        document.getElementById('admin-link').style.display = 'inline';
+    }
+}
