@@ -1,1 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация ДТП | КальтУслуги</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body style="display: block; padding: 40px 20px;">
 
+    <div class="auth-card" style="max-width: 600px; margin: 0 auto;">
+        <h1>💥 РЕГИСТРАЦИЯ ДТП</h1>
+        <p class="subtitle">Оформление дорожно-транспортного происшествия</p>
+
+        <div id="accident-form" style="text-align: left;">
+            <label>1. Место происшествия (Район/Улица):</label>
+            <input type="text" id="acc-loc" placeholder="Например: Перекресток у мэрии">
+
+            <label>2. Дата и время аварии:</label>
+            <input type="text" id="acc-time" placeholder="ДД.ММ.ГГГГ | ЧЧ:ММ">
+
+            <label>3. Участник №1 (Ваш ник и авто):</label>
+            <input type="text" id="acc-p1" placeholder="Nick_Name | Марка авто">
+
+            <label>4. Участник №2 (Ник и авто второго участника):</label>
+            <input type="text" id="acc-p2" placeholder="Nick_Name | Марка авто">
+
+            <label>5. Описание ситуации:</label>
+            <textarea id="acc-descr" rows="4" placeholder="Кто нарушил, как произошло столкновение..."></textarea>
+
+            <label>6. Нанесенный ущерб (Транспорт/Городское имущество):</label>
+            <textarea id="acc-damage" rows="2" placeholder="Разбита фара, помят забор..."></textarea>
+
+            <label>7. Фото/Видео с места ДТП (ссылки):</label>
+            <input type="text" id="acc-proof" placeholder="https://imgur.com/...">
+
+            <label>8. Был ли вызван патруль полиции?</label>
+            <select id="acc-police" style="width:100%; padding:12px; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:12px; margin:10px 0;">
+                <option value="Да" style="background:#1a1425;">Да, оформлено офицером</option>
+                <option value="Нет" style="background:#1a1425;">Нет, европротокол / скрылись</option>
+            </select>
+
+            <button onclick="sendAccidentApp()" class="btn-main" style="margin-top: 20px;">Зарегистрировать аварию</button>
+            <button onclick="location.href='../index.html'" class="btn-exit" style="width: 100%; margin-top: 10px; border: none;">Вернуться назад</button>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function sendAccidentApp() {
+            const user = JSON.parse(localStorage.getItem('gvr_user'));
+            if(!user) return alert("Вы не вошли!");
+
+            const formData = {
+                location: document.getElementById('acc-loc').value,
+                datetime: document.getElementById('acc-time').value,
+                participant_1: document.getElementById('acc-p1').value,
+                participant_2: document.getElementById('acc-p2').value,
+                description: document.getElementById('acc-descr').value,
+                damage: document.getElementById('acc-damage').value,
+                proof: document.getElementById('acc-proof').value,
+                police_called: document.getElementById('acc-police').value
+            };
+
+            if(!formData.location  !formData.participant_2  !formData.proof) {
+                return alert("Пожалуйста, заполните основные данные и прикрепите фото!");
+            }
+
+            const { error } = await supabaseClient
+                .from('applications')
+                .insert([{ 
+                    username: user.username, 
+                    type: 'accident', 
+                    data: formData, 
+                    status: 'pending' 
+                }]);
+
+
+if (error) alert("Ошибка: " + error.message);
+            else {
+                alert("ДТП успешно зарегистрировано в базе данных!");
+                window.location.href = '../index.html';
+            }
+        }
+    </script>
+</body>
+</html>
