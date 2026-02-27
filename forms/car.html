@@ -2,44 +2,195 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Регистрация ТС</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация ТС | КальтУслуги</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --card-bg: #141414;
+            --text: #ffffff;
+            --accent: #ffffff;
+            --border: #262626;
+            --input-bg: #000000;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+            margin-left: 5px;
+            text-transform: uppercase;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            color: #fff;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: border 0.3s;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #555;
+        }
+
+        .btn-main {
+            width: 100%;
+            padding: 15px;
+            background: var(--accent);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .btn-main:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn-exit {
+            background: none;
+            border: none;
+            color: #555;
+            margin-top: 15px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-exit:hover {
+            color: #fff;
+        }
+    </style>
 </head>
-<body style="background:#000;color:#fff;text-align:center;font-family:sans-serif;">
-    <div style="margin-top:50px;">
-        <input type="text" id="b" placeholder="Brand" style="display:block;margin:10px auto;">
-        <input type="text" id="m" placeholder="Model" style="display:block;margin:10px auto;">
-        <button onclick="send()" style="padding:10px 20px;">ОТПРАВИТЬ</button>
+<body>
+
+    <div class="auth-card">
+        <h1>🚗 РЕГИСТРАЦИЯ ТС</h1>
+        <p class="subtitle">Введите данные вашего автомобиля</p>
+
+        <div class="input-group">
+            <label>Марка автомобиля</label>
+            <input type="text" id="brand" placeholder="Напр: Mercedes-Benz">
+        </div>
+
+        <div class="input-group">
+            <label>Модель</label>
+            <input type="text" id="model" placeholder="Напр: S-Class">
+        </div>
+
+        <div class="input-group">
+            <label>Год выпуска</label>
+            <input type="number" id="year" placeholder="2024">
+        </div>
+
+        <div class="input-group">
+            <label>Гос. номер</label>
+            <input type="text" id="plate" placeholder="A000AA | 777">
+        </div>
+
+        <div class="input-group">
+            <label>Фотографии (ссылки)</label>
+            <textarea id="photos" rows="3" placeholder="Imgur, Discord или другие ссылки"></textarea>
+        </div>
+
+        <button onclick="submitCar()" class="btn-main">ПОДАТЬ ЗАЯВКУ</button>
+        <button onclick="window.location.href='../index.html'" class="btn-exit">Вернуться назад</button>
     </div>
 
     <script>
-        const S_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
-        const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
-        const sb = supabase.createClient(S_URL, S_KEY);
+        const SUPABASE_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        async function send() {
-            const brand = document.getElementById('b').value;
-            const model = document.getElementById('m').value;
-            
-            if (brand == "" || model == "") return alert("Empty!");
+        async function submitCar() {
+            const b = document.getElementById('brand').value.trim();
+            const m = document.getElementById('model').value.trim();
+            const y = document.getElementById('year').value.trim();
+            const p = document.getElementById('plate').value.trim();
+            const ph = document.getElementById('photos').value.trim();
 
-            const u = localStorage.getItem('gvr_user');
-            if (!u) return alert("No user!");
-            const user = JSON.parse(u);
+            if (!b || !m || !p) {
+                alert("Пожалуйста, заполните марку, модель и номер!");
+                return;
+            }
+
+            const storedUser = localStorage.getItem('gvr_user');
+            if (!storedUser) {
+                alert("Ошибка: вы не авторизованы!");
+                return;
+            }
+            const user = JSON.parse(storedUser);
 
             try {
-                const { error } = await sb.from('applications').insert([{ 
-                    username: user.username, 
-                    type: 'car', 
-                    data: { brand, model }, 
-                    status: 'pending' 
-                }]);
+                const { error } = await supabaseClient
+                    .from('applications')
+                    .insert([{ 
+                        username: user.username, 
+                        type: 'car', 
+                        data: { brand: b, model: m, year: y, plate: p, photos: ph },
+                        status: 'pending' 
+                    }]);
+
                 if (error) throw error;
-                alert("Done!");
-            } catch (e) {
-                alert(e.message);
+                alert("✅ Заявка успешно отправлена!");
+                window.location.href = '../index.html';
+            } catch (err) {
+                alert("Ошибка: " + err.message);
             }
         }
     </script>
 </body>
-</html>
+    </html>
