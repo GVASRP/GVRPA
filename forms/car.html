@@ -2,22 +2,21 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация ТС | КальтУслуги</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="../style.css">
 </head>
-<body style="background: #000; color: #fff; font-family: sans-serif; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+<body style="background: #000; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0;">
 
-    <div style="background: #111; padding: 30px; border-radius: 15px; border: 1px solid #333; width: 350px; text-align: center;">
-        <h1 style="font-size: 24px; margin-bottom: 20px;">🚗 РЕГИСТРАЦИЯ ТС</h1>
+    <div style="background: #111; padding: 30px; border-radius: 15px; border: 1px solid #333; width: 320px; text-align: center;">
+        <h2>🚗 РЕГИСТРАЦИЯ ТС</h2>
         
-        <input type="text" id="car-brand" placeholder="Марка" style="width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box;">
-        <input type="text" id="car-model" placeholder="Модель" style="width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box;">
-        <input type="text" id="car-plate" placeholder="Номер" style="width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box;">
+        <input type="text" id="brand" placeholder="Марка" style="width: 100%; padding: 10px; margin: 10px 0; background: #000; border: 1px solid #333; color: #fff;">
+        <input type="text" id="model" placeholder="Модель" style="width: 100%; padding: 10px; margin: 10px 0; background: #000; border: 1px solid #333; color: #fff;">
+        <input type="text" id="plate" placeholder="Номер" style="width: 100%; padding: 10px; margin: 10px 0; background: #000; border: 1px solid #333; color: #fff;">
         
-        <button onclick="sendCarData()" style="width: 100%; padding: 14px; margin-top: 20px; background: #fff; color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
-            Отправить заявку
+        <button onclick="saveApplication()" style="width: 100%; padding: 12px; background: #fff; color: #000; font-weight: bold; cursor: pointer; border: none; border-radius: 5px; margin-top: 10px;">
+            Отправить
         </button>
         
         <button onclick="window.location.href='../index.html'" style="background: none; border: none; color: #666; margin-top: 15px; cursor: pointer;">
@@ -26,48 +25,48 @@
     </div>
 
     <script>
-        // Проверка: работает ли вообще скрипт?
-        console.log("Скрипт car.html успешно загружен и прочитан браузером!");
+        console.log("Скрипт запущен!"); // Если увидишь это в консоли - мы победили
 
-        const SUPABASE_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const S_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
+        const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
+        const sbClient = supabase.createClient(S_URL, S_KEY);
 
-        async function sendCarData() {
-            console.log("Кнопка нажата!");
+        async function saveApplication() {
+            console.log("Кнопка работает!");
 
-            const brand = document.getElementById('car-brand').value.trim();
-            const model = document.getElementById('car-model').value.trim();
-            const plate = document.getElementById('car-plate').value.trim();
+            const b = document.getElementById('brand').value;
+            const m = document.getElementById('model').value;
+            const p = document.getElementById('plate').value;
 
-            if (!brand  !model  !plate) {
-                alert("Заполните все поля!");
+            // Максимально тупая и надежная проверка без знаков "!"
+            if (b == ""  m == ""  p == "") {
+                alert("Заполните все поля");
                 return;
             }
 
-            const storedUser = localStorage.getItem('gvr_user');
-            if (!storedUser) {
-                alert("Ошибка: вы не вошли в аккаунт!");
+            const userJson = localStorage.getItem('gvr_user');
+            if (userJson == null) {
+                alert("Войдите в аккаунт");
                 return;
             }
-            const user = JSON.parse(storedUser);
+            
+            const user = JSON.parse(userJson);
 
             try {
-                const { error } = await supabaseClient
+                const { error } = await sbClient
                     .from('applications')
                     .insert([{ 
                         username: user.username, 
                         type: 'car', 
-                        data: { brand, model, plate },
+                        data: { brand: b, model: m, plate: p },
                         status: 'pending' 
                     }]);
 
                 if (error) throw error;
-                alert("Заявка отправлена!");
+                alert("Успешно отправлено!");
                 window.location.href = '../index.html';
-            } catch (err) {
-                console.error("Ошибка Supabase:", err);
-                alert("Ошибка: " + err.message);
+            } catch (e) {
+                alert("Ошибка: " + e.message);
             }
         }
     </script>
