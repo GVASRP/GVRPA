@@ -55,13 +55,10 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // 1. Проверка прав при входе
+        // Проверка прав администратора
         function checkAdmin() {
             const userStr = localStorage.getItem('gvr_user');
-            if (!userStr) {
-                window.location.href = 'index.html';
-                return;
-            }
+            if (!userStr) { window.location.href = 'index.html'; return; }
             const user = JSON.parse(userStr);
             if (user.role !== 'admin') {
                 alert("У вас нет прав администратора!");
@@ -69,7 +66,7 @@
             }
         }
 
-        // 2. Загрузка списка ожидающих заявок
+        // Загрузка заявок со статусом 'pending'
         async function loadApps() {
             const { data, error } = await supabaseClient
                 .from('applications')
@@ -80,11 +77,7 @@
             const list = document.getElementById('apps-list');
             list.innerHTML = '';
 
-            if (error) {
-                list.innerHTML = `<p>Ошибка: ${error.message}</p>`;
-                return;
-            }
-
+            if (error) { list.innerHTML = `<p>Ошибка: ${error.message}</p>`; return; }
             if (!data || data.length === 0) {
                 list.innerHTML = '<p style="text-align: center; color: #666;">Новых заявок пока нет.</p>';
                 return;
@@ -93,12 +86,9 @@
             data.forEach(app => {
                 const card = document.createElement('div');
                 card.className = 'card';
-
                 let details = "";
-                if (app.data) {
-                    for (let key in app.data) {
-                        details += `<b>${key}:</b> ${app.data[key]}<br>`;
-                    }
+                for (let key in app.data) {
+                    details += `<b>${key}:</b> ${app.data[key]}<br>`;
                 }
 
                 card.innerHTML = `
@@ -116,63 +106,76 @@
             });
         }
 
-        // 3. Функция одобрения/отклонения
+        // Основная логика обработки
         async function updateStatus(id, newStatus) {
             if (newStatus === 'rejected') {
                 const { error } = await supabaseClient
                     .from('applications')
                     .update({ status: 'rejected' })
                     .eq('id', id);
-                
                 if (error) return alert("Ошибка: " + error.message);
-                alert("Заявка отклонена.");
+                alert("Отклонено.");
                 return loadApps();
             }
 
-            // Если одобряем:
+            // Получаем полные данные заявки
             const { data: app, error: fetchError } = await supabaseClient
                 .from('applications')
                 .select('*')
                 .eq('id', id)
                 .single();
 
-            if (fetchError || !app) return alert("Ошибка получения данных заявки.");
+            if (fetchError || !app) return alert("Ошибка получения данных.");
 
             try {
-                // ПЕРЕНОС ДАННЫХ В ТАБЛИЦУ CITIZENS
-                if (app.type === 'id' || app.type === 'license') {
-                    // Проверяем p6 (из твоей анкеты) или full_name
-                    const fullName = app.data.p6 || app.data.full_name || "Не указано";
-                    const address = app.data.address || app.data.lic_address || "Не указано";
+                const nick = app.username;
+                const fullName = app.data.p6 || app.data.full_name || "Не указано";
+                const address = app.data.address || app.data.lic_address || "Не указано";
+
+                // Проверяем наличие гражданина в базе citizens
+                const { data: existing } = await supabaseClient
+                    .from('citizens')
+                    .select('roblox_nick')
+                    .eq('roblox_nick', nick)
+                    .single();
+
+                let dbError;
+                if (existing) {
+                    // Обновляем существующего
+                    const updateObj = { full_name: fullName, address: address };
+                    if (app.type === 'license') updateObj.has_license = true;
                     
-                    const { error: citErr } = await supabaseClient.from('citizens').upsert({ 
-                        roblox_nick: app.username, 
-                        full_name: fullName,
-                        address: address,
-                        has_license: (app.type === 'license' ? true : undefined)
-                    }, { onConflict: 'roblox_nick' });
-
-                    if (citErr) throw citErr;
-                } 
-                
-                else if (app.type === 'car') {
-                    const carBrand = app.data.brand || "Автомобиль";
-                    const carNum = app.data.number || "Б/Н";
-                    const carInfo = `${carBrand} [${carNum}]`;
-                    
-                    let { data: citizen } = await supabaseClient.from('citizens').select('car_data').eq('roblox_nick', app.username).single();
-                    let oldCars = (citizen && citizen.car_data && citizen.car_data !== 'Нет транспорта') ? citizen.car_data : "";
-                    let updatedCars = oldCars ? oldCars + ", " + carInfo : carInfo;
-
-                    const { error: carErr } = await supabaseClient.from('citizens').upsert({ 
-                        roblox_nick: app.username, 
-                        car_data: updatedCars 
-                    }, { onConflict: 'roblox_nick' });
-
-                    if (carErr) throw carErr;
+                    const { error } = await supabaseClient
+                        .from('citizens')
+                        .update(updateObj)
+                        .eq('roblox_nick', nick);
+                    dbError = error;
+                } else {
+                    // Создаем нового
+                    const { error } = await supabaseClient
+                        .from('citizens')
+                        .insert([{ 
+                            roblox_nick: nick, 
+                            full_name: fullName, 
+                            address: address,
+                            has_license: (app.type === 'license'),
+                            car_data: (app.type === 'car' ? `${app.data.brand} [${app.data.number}]` : 'Нет транспорта')
+                        }]);
+                    dbError = error;
                 }
 
-                // В конце меняем статус самой заявки
+                if (dbError) throw dbError;
+
+                // Если это машина и гражданин уже был, добавляем авто к списку
+                if (app.type === 'car' && existing) {
+                    const carInfo = `${app.data.brand || "Авто"} [${app.data.number || "Б/Н"}]`;
+                    let { data: cit } = await supabaseClient.from('citizens').select('car_data').eq('roblox_nick', nick).single();
+                    let oldCars = (cit && cit.car_data && cit.car_data !== 'Нет транспорта') ? cit.car_data : "";
+                    let newCars = oldCars ? oldCars + ", " + carInfo : carInfo;
+                    await supabaseClient.from('citizens').update({ car_data: newCars }).eq('roblox_nick', nick);
+                }
+
+                // В финале меняем статус заявки на 'approved'
                 const { error: finalErr } = await supabaseClient
                     .from('applications')
                     .update({ status: 'approved' })
@@ -180,12 +183,12 @@
 
                 if (finalErr) throw finalErr;
 
-                alert("Гражданин внесен в базу данных МВД!");
+                alert("Успешно! Гражданин обновлен в базе МВД.");
                 loadApps();
 
             } catch (err) {
                 console.error("Ошибка синхронизации:", err);
-                alert("Ошибка: " + err.message);
+                alert("Ошибка синхронизации: " + err.message);
             }
         }
 
