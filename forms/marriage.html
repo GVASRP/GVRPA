@@ -5,43 +5,130 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация Брака | КальтУслуги</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="../style.css">
-</head>
-<body style="display: block; padding: 40px 20px;">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --card-bg: #141414;
+            --text: #ffffff;
+            --accent: #d946ef; /* Свадебный розово-пурпурный */
+            --border: #262626;
+            --input-bg: #000000;
+        }
 
-    <div class="auth-card" style="max-width: 600px; margin: 0 auto;">
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            padding: 35px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            width: 100%;
+            max-width: 550px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        h1 { font-size: 26px; text-align: center; margin-bottom: 5px; }
+        .subtitle { color: #666; font-size: 14px; text-align: center; margin-bottom: 30px; }
+
+        h3 {
+            color: var(--accent);
+            border-bottom: 1px solid rgba(217, 70, 239, 0.3);
+            padding-bottom: 8px;
+            font-size: 18px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-size: 13px; color: #888; margin-bottom: 6px; }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            color: #fff;
+            border-radius: 10px;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: border 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .btn-main {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            text-transform: uppercase;
+        }
+
+        .btn-exit {
+            background: none;
+            border: none;
+            color: #555;
+            margin-top: 15px;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card">
         <h1>💍 РЕГИСТРАЦИЯ БРАКА</h1>
         <p class="subtitle">Официальное заключение союза в штате GVRPA</p>
 
-        <div id="marriage-form" style="text-align: left;">
-            <h3 style="color: var(--accent-purple); border-bottom: 1px solid rgba(139, 92, 246, 0.3); padding-bottom: 5px;">Супруги</h3>
-            
-            <label>1. Ник в Roblox и юз в телеграмме (Супруг №1):</label>
-            <input type="text" id="m-partner1" placeholder="Nick_Name первого">
-
-            <label>2. Ник в Roblox и юз в телеграмме (Супруг №2):</label>
-            <input type="text" id="m-partner2" placeholder="Nick_Name второго">
-
-            <h3 style="margin-top: 25px; color: var(--accent-purple); border-bottom: 1px solid rgba(139, 92, 246, 0.3); padding-bottom: 5px;">Детали союза</h3>
-
-            <label>3. Общая фамилия после брака:</label>
-            <input type="text" id="m-surname" placeholder="Какую фамилию оставляете?">
-
-            <label>4. Дата и время церемонии:</label>
-            <input type="text" id="m-date" placeholder="ДД.ММ.ГГГГ | ЧЧ:ММ">
-
-            <label>5. Ник свидетеля (если был):</label>
-            <input type="text" id="m-witness" placeholder="Nick_Name свидетеля">
-
-            <label>6. Фото/Скриншот с церемонии (ссылка):</label>
-            <input type="text" id="m-proof" placeholder="https://imgur.com/...">
-
-            <label>7. Место проведения (Церковь/Мэрия/Природа):</label>
-            <input type="text" id="m-loc" placeholder="Например: Центральная церковь">
-
-            <button onclick="sendMarriageApp()" class="btn-main" style="margin-top: 20px;">Подать заявление о браке</button>
-            <button onclick="location.href='../index.html'" class="btn-exit" style="width: 100%; margin-top: 10px; border: none;">Отмена</button>
+        <h3>Супруги</h3>
+        <div class="input-group">
+            <label>Ник и Telegram (Супруг №1)</label>
+            <input type="text" id="m-partner1" placeholder="Nick_Name | @tg">
         </div>
+
+        <div class="input-group">
+            <label>Ник и Telegram (Супруг №2)</label>
+            <input type="text" id="m-partner2" placeholder="Nick_Name | @tg">
+        </div>
+
+        <h3>Детали союза</h3>
+        <div class="input-group">
+            <label>Общая фамилия после брака</label>
+            <input type="text" id="m-surname" placeholder="Какую фамилию оставляете?">
+        </div>
+
+        <div class="input-group">
+            <label>Дата и время церемонии</label>
+            <input type="text" id="m-date" placeholder="ДД.ММ.ГГГГ | ЧЧ:ММ">
+        </div>
+
+        <div class="input-group">
+            <label>Фото/Скриншот церемонии (ссылка)</label>
+            <input type="text" id="m-proof" placeholder="https://imgur.com/...">
+        </div>
+
+        <button onclick="sendMarriageApp()" class="btn-main">Оформить союз</button>
+        <button onclick="window.location.href='../index.html'" class="btn-exit">Отмена</button>
     </div>
 
     <script>
@@ -50,36 +137,37 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         async function sendMarriageApp() {
-            const user = JSON.parse(localStorage.getItem('gvr_user'));
-            if(!user) return alert("Вы не вошли!");
+            const saved = localStorage.getItem('gvr_user');
+            if(!saved) return alert("Вы не вошли в систему!");
+            const user = JSON.parse(saved);
 
-            const formData = {
-                partner_1: document.getElementById('m-partner1').value,
-                partner_2: document.getElementById('m-partner2').value,
-                new_surname: document.getElementById('m-surname').value,
-                wedding_date: document.getElementById('m-date').value,
-                witness: document.getElementById('m-witness').value,
-                evidence: document.getElementById('m-proof').value,
-                location: document.getElementById('m-loc').value
-            };
+            const p1 = document.getElementById('m-partner1').value.trim();
+            const p2 = document.getElementById('m-partner2').value.trim();
+            const sur = document.getElementById('m-surname').value.trim();
+            const date = document.getElementById('m-date').value.trim();
+            const proof = document.getElementById('m-proof').value.trim();
 
-            if(!formData.partner_1  !formData.partner_2  !formData.new_surname) {
-                return alert("Пожалуйста, укажите ники обоих супругов и будущую фамилию!");
+            // ИСПРАВЛЕНО: добавлена логика ||
+            if(!p1 || !p2 || !sur) {
+                alert("Укажите данные обоих супругов и фамилию!");
+                return;
             }
 
-            const { error } = await supabaseClient
-                .from('applications')
-                .insert([{ 
-                    username: user.username, 
-                    type: 'marriage', 
-                    data: formData, 
-                    status: 'pending' 
-                }]);
+            try {
+                const { error } = await supabaseClient
+                    .from('applications')
+                    .insert([{ 
+                        username: user.username, 
+                        type: 'marriage', 
+                        data: { partner_1: p1, partner_2: p2, surname: sur, wedding_date: date, evidence: proof }, 
+                        status: 'pending' 
+                    }]);
 
-            if (error) alert("Ошибка: " + error.message);
-            else {
-                alert("Поздравляем! Заявление на регистрацию брака отправлено в ЗАГС.");
+                if (error) throw error;
+                alert("✅ Заявление подано! Поздравляем!");
                 window.location.href = '../index.html';
+            } catch (err) {
+                alert("Ошибка: " + err.message);
             }
         }
     </script>
