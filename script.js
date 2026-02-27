@@ -101,3 +101,31 @@ function linkTelegram() {
     
     window.open(link, '_blank');
 }
+// Функция открытия окна
+function linkTelegram() {
+    document.getElementById('tg-modal').style.display = 'flex';
+}
+
+// Функция сохранения ID в базу
+async function saveTgId() {
+    const tgId = document.getElementById('tg-id-input').value.trim();
+    // Берем ник текущего пользователя из того же места, где ты его хранишь при логине
+    // Если у тебя ник хранится в переменной или localStorage:
+    const robloxNick = localStorage.getItem('userNick'); // Или как у тебя в коде реализовано получение ника
+
+    if (!tgId) return alert("Введите ID!");
+
+    const { data, error } = await supabase
+        .from('telegram_users')
+        .upsert([{ 
+            username: robloxNick, 
+            chat_id: tgId 
+        }], { onConflict: 'username' });
+
+    if (error) {
+        alert("Ошибка: " + error.message);
+    } else {
+        alert("Успешно привязано! Теперь ждите уведомлений.");
+        document.getElementById('tg-modal').style.display = 'none';
+    }
+}
