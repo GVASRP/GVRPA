@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Админ-панель | КальтУслуги</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="display: block; padding: 20px;">
+
+    <div class="container" style="max-width: 800px; margin: 0 auto;">
+        <div style="display:flex; justify-content: space-between; align-items: center;">
+            <h1>🛠 Управление заявками</h1>
+            <button onclick="location.href='index.html'" class="btn-exit">На главную</button>
+        </div>
+
+        <div id="apps-list" style="margin-top: 30px;">
+            <p class="subtitle">Загрузка заявок...</p>
+        </div>
+    </div>
+
+    <script>
+        // ВСТАВЬ СВОИ ДАННЫЕ SUPABASE
+        const SUPABASE_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function loadApps() {
+            const { data, error } = await supabaseClient
+                .from('applications')
+                .select('*')
+                .eq('status', 'pending')
+                .order('created_at', { ascending: false });
+
+            const list = document.getElementById('apps-list');
+            list.innerHTML = '';
+
+            if (data.length === 0) {
+                list.innerHTML = '<p class="subtitle">Новых заявок пока нет.</p>';
+                return;
+            }
+
+            data.forEach(app => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.textAlign = 'left';
+                card.style.marginBottom = '20px';
+                card.style.cursor = 'default';
+
+                // Красиво разбираем данные из формы (Марка, Модель и т.д.)
+                let infoHtml = '';
+                if (typeof app.data === 'object') {
+                    infoHtml = Object.entries(app.data)
+                        .map(([key, val]) => <b>${key}:</b> ${val})
+                        .join('<br>');
+                } else {
+                    infoHtml = app.data;
+                }
+
+                card.innerHTML = 
+                    <div style="display:flex; justify-content:space-between; align-items:start;">
+                        <div>
+                            <span style="color:var(--accent-purple); font-weight:bold;"># ${app.type.toUpperCase()}</span>
+                            <h3 style="margin: 5px 0;">От: ${app.username}</h3>
+                            <div style="color:var(--text-dim); font-size:14px;">${infoHtml}</div>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button onclick="approveApp('${app.id}')" class="btn-main" style="width:auto; padding:10px; background:#10b981;">✅</button>
+                            <button onclick="rejectApp('${app.id}')" class="btn-main" style="width:auto; padding:10px; background:#ef4444;">❌</button>
+                        </div>
+                    </div>
+                ;
+                list.appendChild(card);
+            });
+        }
+
+        async function approveApp(id) {
+            const { error } = await supabaseClient
+                .from('applications')
+                .update({ status: 'approved' })
+                .eq('id', id);
+            
+            if (!error) { alert('Одобрено!'); loadApps(); }
+        }
+
+        async function rejectApp(id) {
+            const { error } = await supabaseClient
+                .from('applications')
+                .update({ status: 'rejected' })
+                .eq('id', id);
+            
+            if (!error) { alert('Отклонено!'); loadApps(); }
+        }
+
+        window.onload = loadApps;
+    </script>
+</body>
+</html>
