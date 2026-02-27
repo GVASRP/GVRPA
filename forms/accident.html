@@ -3,68 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Регистрация ДТП | КальтУслуги</title>
+    <title>Регистрация ТС | КальтУслуги</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="../style.css">
     <style>
-        label {
-            display: block;
-            margin-top: 15px;
-            margin-bottom: 5px;
-            font-size: 14px;
-            color: #aaa;
-            text-align: left;
-        }
-        textarea {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 12px;
-            box-sizing: border-box;
-            font-family: inherit;
-        }
+        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; }
+        #auth-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .auth-card { background: #111; padding: 30px; border-radius: 15px; border: 1px solid #333; width: 350px; text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box; }
+        .btn-main { width: 100%; padding: 14px; margin-top: 20px; background: #fff; color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; }
+        .btn-exit { background: none; border: none; color: #666; margin-top: 15px; cursor: pointer; width: 100%; }
     </style>
 </head>
 <body>
 
-    <div id="auth-screen" style="display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 40px 20px;">
-        <div class="auth-card" style="max-width: 600px; width: 100%;">
-            <h1>💥 РЕГИСТРАЦИЯ ДТП</h1>
-            <p class="subtitle">Оформление дорожно-транспортного происшествия</p>
-
-            <div id="login-box">
-                <label>1. Место происшествия (Район/Улица):</label>
-                <input type="text" id="acc-loc" placeholder="Например: Перекресток у мэрии">
-
-                <label>2. Дата и время аварии:</label>
-                <input type="text" id="acc-time" placeholder="ДД.ММ.ГГГГ | ЧЧ:ММ">
-
-                <label>3. Участник №1 (Ваш ник и авто):</label>
-                <input type="text" id="acc-p1" placeholder="Nick_Name | Марка авто">
-
-                <label>4. Участник №2 (Ник и авто второго участника):</label>
-                <input type="text" id="acc-p2" placeholder="Nick_Name | Марка авто">
-
-                <label>5. Описание ситуации:</label>
-                <textarea id="acc-descr" rows="4" placeholder="Кто нарушил, как произошло столкновение..."></textarea>
-
-                <label>6. Нанесенный ущерб:</label>
-                <textarea id="acc-damage" rows="2" placeholder="Разбита фара, помят забор..."></textarea>
-
-                <label>7. Фото/Видео с места ДТП (ссылки):</label>
-                <input type="text" id="acc-proof" placeholder="https://imgur.com/...">
-
-                <label>8. Был ли вызван патруль полиции?</label>
-                <select id="acc-police" style="width:100%; padding:12px; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:12px; margin-bottom: 10px;">
-                    <option value="Да" style="background:#1a1425;">Да, оформлено офицером</option>
-                    <option value="Нет" style="background:#1a1425;">Нет, европротокол / скрылись</option>
-                </select>
-
-                <button onclick="sendAccidentApp()" class="btn-main" style="margin-top: 25px;">Зарегистрировать аварию</button>
-                <button onclick="location.href='../index.html'" class="btn-exit" style="width: 100%; margin-top: 10px;">Назад</button>
-            </div>
+    <div id="auth-screen">
+        <div class="auth-card">
+            <h1>🚗 РЕГИСТРАЦИЯ ТС</h1>
+            <p style="color: #888; margin-bottom: 20px;">Введите данные автомобиля</p>
+            
+            <input type="text" id="car-brand" placeholder="Марка">
+            <input type="text" id="car-model" placeholder="Модель">
+            <input type="text" id="car-plate" placeholder="Гос. номер">
+            
+            <button onclick="sendCarData()" class="btn-main">Отправить заявку</button>
+            <button onclick="window.location.href='../index.html'" class="btn-exit">Отмена</button>
         </div>
     </div>
 
@@ -73,41 +36,47 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        async function sendAccidentApp() {
-            const savedUser = localStorage.getItem('gvr_user');
-            if(!savedUser) return alert("Вы не вошли!");
-            const user = JSON.parse(savedUser);
+        async function sendCarData() {
+            console.log("Попытка отправки данных...");
 
-            const formData = {
+            const brandVal = document.getElementById('car-brand').value;
+            const modelVal = document.getElementById('car-model').value;
+            const plateVal = document.getElementById('car-plate').value;
 
-location: document.getElementById('acc-loc').value,
-                datetime: document.getElementById('acc-time').value,
-                participant_1: document.getElementById('acc-p1').value,
-                participant_2: document.getElementById('acc-p2').value,
-                description: document.getElementById('acc-descr').value,
-                damage: document.getElementById('acc-damage').value,
-                proof: document.getElementById('acc-proof').value,
-                police_called: document.getElementById('acc-police').value
-            };
-
-            // ИСПРАВЛЕНО: Добавлены операторы ||
-            if(!formData.location  !formData.participant_2  !formData.proof) {
-                return alert("Пожалуйста, заполните основные данные и прикрепите фото!");
+            if (!brandVal || !modelVal || !plateVal) {
+                alert("Пожалуйста, заполните все поля!");
+                return;
             }
 
-            const { error } = await supabaseClient
-                .from('applications')
-                .insert([{ 
-                    username: user.username, 
-                    type: 'accident', 
-                    data: formData, 
-                    status: 'pending' 
-                }]);
+            const storedUser = localStorage.getItem('gvr_user');
+            if (!storedUser) {
+                alert("Ошибка: вы не авторизованы!");
+                return;
+            }
 
-            if (error) alert("Ошибка: " + error.message);
-            else {
-                alert("ДТП успешно зарегистрировано!");
+            const user = JSON.parse(storedUser);
+
+            try {
+                const { error } = await supabaseClient
+                    .from('applications')
+                    .insert([{ 
+                        username: user.username, 
+                        type: 'car', 
+                        data: { 
+                            brand: brandVal, 
+                            model: modelVal, 
+                            plate: plateVal 
+                        },
+                        status: 'pending' 
+                    }]);
+
+                if (error) throw error;
+
+                alert("✅ Заявка успешно отправлена!");
                 window.location.href = '../index.html';
+            } catch (err) {
+                console.error(err);
+                alert("Ошибка при отправке: " + err.message);
             }
         }
     </script>
