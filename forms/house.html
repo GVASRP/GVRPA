@@ -6,34 +6,57 @@
     <title>Регистрация дома | КальтУслуги</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="../style.css">
+    <style>
+        /* Добавим стили для меток, чтобы они были аккуратными */
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #aaa;
+            text-align: left;
+        }
+        textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+    </style>
 </head>
-<body style="display: block; padding: 40px 20px;">
+<body>
 
-    <div class="auth-card" style="max-width: 500px; margin: 0 auto;">
-        <h1>🏠 РЕГИСТРАЦИЯ ДОМА</h1>
-        <p class="subtitle">Внесение вашего жилья в реестр прописки</p>
+    <div id="auth-screen" style="display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 40px 20px;">
+        <div class="auth-card" style="max-width: 500px; width: 100%;">
+            <h1>🏠 РЕГИСТРАЦИЯ ДОМА</h1>
+            <p class="subtitle">Внесение вашего жилья в реестр прописки</p>
 
-        <div id="house-form" style="text-align: left;">
-            <label>1. Ник в Roblox:</label>
-            <input type="text" id="h-nick" placeholder="Nick_Name">
+            <div id="login-box">
+                <label>1. Ник в Roblox:</label>
+                <input type="text" id="h-nick" placeholder="Nick_Name">
 
-            <label>2. Номер дома (House Number):</label>
-            <input type="number" id="h-num" placeholder="Например: 124">
+                <label>2. Номер дома (House Number):</label>
+                <input type="number" id="h-num" placeholder="Например: 124">
 
-            <label>3. Район / Улица:</label>
-            <input type="text" id="h-street" placeholder="Например: Northwood St.">
+                <label>3. Район / Улица:</label>
+                <input type="text" id="h-street" placeholder="Например: Northwood St.">
 
-            <label>4. Количество комнат:</label>
-            <input type="number" id="h-rooms" placeholder="Например: 3">
+                <label>4. Количество комнат:</label>
+                <input type="number" id="h-rooms" placeholder="Например: 3">
 
-            <label>5. Фото дома (ссылка на скриншот):</label>
-            <input type="text" id="h-photo" placeholder="https://imgur.com/...">
+                <label>5. Фото дома (ссылка на скриншот):</label>
+                <input type="text" id="h-photo" placeholder="https://imgur.com/...">
 
-            <label>6. Кто еще проживает в доме? (Ники):</label>
-            <textarea id="h-people" rows="3" placeholder="Если живете один — ставьте прочерк"></textarea>
+                <label>6. Кто еще проживает в доме? (Ники):</label>
+                <textarea id="h-people" rows="3" placeholder="Если живете один — ставьте прочерк"></textarea>
 
-            <button onclick="sendHouseApp()" class="btn-main" style="margin-top: 20px;">Зарегистрировать дом</button>
-            <button onclick="location.href='../index.html'" class="btn-exit" style="width: 100%; margin-top: 10px; border: none;">Назад</button>
+                <button onclick="sendHouseApp()" class="btn-main" style="margin-top: 25px;">Зарегистрировать дом</button>
+                <button onclick="location.href='../index.html'" class="btn-exit" style="width: 100%; margin-top: 10px;">Назад</button>
+            </div>
         </div>
     </div>
 
@@ -43,8 +66,9 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         async function sendHouseApp() {
-            const user = JSON.parse(localStorage.getItem('gvr_user'));
-            if(!user) return alert("Вы не вошли в систему!");
+            const savedUser = localStorage.getItem('gvr_user');
+            if(!savedUser) return alert("Вы не вошли в систему!");
+            const user = JSON.parse(savedUser);
 
             const formData = {
                 roblox_nick: document.getElementById('h-nick').value,
@@ -68,9 +92,9 @@
                     status: 'pending' 
                 }]);
 
-            if (error) alert("Ошибка: " + error.message);
+if (error) alert("Ошибка: " + error.message);
             else {
-                alert("Заявка на регистрацию дома подана! Скоро он появится в вашей базе.");
+                alert("Заявка на регистрацию дома подана!");
                 window.location.href = '../index.html';
             }
         }
