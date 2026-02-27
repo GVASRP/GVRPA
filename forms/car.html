@@ -41,47 +41,46 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         async function sendCarApplication() {
-            // Очищаем консоль для чистого теста
-            console.clear();
-            console.log("Функция вызвана!");
+            // Чтобы не было SyntaxError, мы убираем сложную проверку и делаем её по шагам
+            const brand = document.getElementById('car-brand').value;
+            const model = document.getElementById('car-model').value;
+            const plate = document.getElementById('car-plate').value;
+
+            if (brand === ""  model === ""  plate === "") {
+                alert("Пожалуйста, заполните основные поля!");
+                return;
+            }
+
+            const userData = localStorage.getItem('gvr_user');
+            if (!userData) {
+                alert("Вы не вошли в систему!");
+                return;
+            }
+            const user = JSON.parse(userData);
 
             try {
-                const userData = localStorage.getItem('gvr_user');
-                if (!userData) {
-                    alert("Сначала войдите в систему!");
-                    return;
-                }
-                const user = JSON.parse(userData);
-
-                const brand = document.getElementById('car-brand').value;
-                const model = document.getElementById('car-model').value;
-                const year = document.getElementById('car-year').value;
-                const plate = document.getElementById('car-plate').value;
-                const photos = document.getElementById('car-photos').value;
-
-                // ИСПРАВЛЕННЫЙ СИНТАКСИС (используем ||)
-                if (!brand  !model  !plate) {
-                    alert("Заполните марку, модель и номер!");
-                    return;
-                }
-
                 const { error } = await supabaseClient
                     .from('applications')
                     .insert([{ 
                         username: user.username, 
                         type: 'car', 
-                        data: { brand, model, year, plate, photos },
+                        data: { 
+                            brand: brand, 
+                            model: model, 
+                            year: document.getElementById('car-year').value, 
+                            plate: plate, 
+                            photos: document.getElementById('car-photos').value 
+                        },
                         status: 'pending' 
                     }]);
 
                 if (error) throw error;
 
-                alert("Заявка успешно отправлена!");
+                alert("✅ Заявка отправлена!");
                 window.location.href = '../index.html';
 
-} catch (err) {
-                console.error("Ошибка:", err);
-                alert("Произошла ошибка: " + err.message);
+            } catch (err) {
+                alert("Ошибка: " + err.message);
             }
         }
     </script>
