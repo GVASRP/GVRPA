@@ -6,31 +6,25 @@
     <title>Регистрация ТС | КальтУслуги</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="../style.css">
-    <style>
-        body { background-color: #000; color: white; font-family: sans-serif; margin: 0; }
-        #auth-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-        .auth-card { background: #111; padding: 30px; border-radius: 15px; border: 1px solid #333; width: 100%; max-width: 400px; text-align: center; }
-        input, textarea { width: 100%; margin: 10px 0; padding: 12px; background: #000; border: 1px solid #333; color: white; border-radius: 8px; box-sizing: border-box; }
-        .btn-main { width: 100%; padding: 12px; background: #fff; color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        .btn-exit { background: none; border: none; color: #666; cursor: pointer; margin-top: 10px; width: 100%; }
-    </style>
 </head>
-<body>
+<body style="background: #000; color: #fff; font-family: sans-serif; margin: 0;">
 
-    <div id="auth-screen">
-        <div class="auth-card">
-            <h1>🚗 РЕГИСТРАЦИЯ ТС</h1>
-            <p style="color: #888;">Введите данные вашего автомобиля</p>
-
-            <div id="login-box">
-                <input type="text" id="car-brand" placeholder="Марка">
-                <input type="text" id="car-model" placeholder="Модель">
-                <input type="number" id="car-year" placeholder="Год выпуска">
-                <input type="text" id="car-plate" placeholder="Гос. номер">
-                <textarea id="car-photos" placeholder="Ссылки на фото"></textarea>
+    <div id="auth-screen" style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+        <div class="auth-card" style="background: #111; padding: 30px; border-radius: 15px; border: 1px solid #333; width: 350px; text-align: center;">
+            <h1 style="font-size: 24px;">🚗 РЕГИСТРАЦИЯ ТС</h1>
+            
+            <div style="margin-top: 20px;">
+                <input type="text" id="car-brand" placeholder="Марка" style="width: 100%; padding: 10px; margin: 5px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 5px;">
+                <input type="text" id="car-model" placeholder="Модель" style="width: 100%; padding: 10px; margin: 5px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 5px;">
+                <input type="text" id="car-plate" placeholder="Номер" style="width: 100%; padding: 10px; margin: 5px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 5px;">
                 
-                <button onclick="sendCarApplication()" class="btn-main">"Отправить заявку"</button>
-                <button onclick="location.href='../index.html'" class="btn-exit">Назад</button>
+                <button onclick="sendCarData()" style="width: 100%; padding: 12px; margin-top: 15px; background: #fff; color: #000; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                    Отправить заявку
+                </button>
+                
+                <button onclick="window.location.href='../index.html'" style="background: none; border: none; color: #666; margin-top: 10px; cursor: pointer;">
+                    Отмена
+                </button>
             </div>
         </div>
     </div>
@@ -40,23 +34,24 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        async function sendCarApplication() {
-            // Чтобы не было SyntaxError, мы убираем сложную проверку и делаем её по шагам
-            const brand = document.getElementById('car-brand').value;
-            const model = document.getElementById('car-model').value;
-            const plate = document.getElementById('car-plate').value;
+        async function sendCarData() {
+            // Берем значения по одному
+            const b = document.getElementById('car-brand').value;
+            const m = document.getElementById('car-model').value;
+            const p = document.getElementById('car-plate').value;
 
-            if (brand === ""  model === ""  plate === "") {
-                alert("Пожалуйста, заполните основные поля!");
+            // Самая простая проверка в мире
+            if (b == ""  m == ""  p == "") {
+                alert("Заполните все поля!");
                 return;
             }
 
-            const userData = localStorage.getItem('gvr_user');
-            if (!userData) {
+            const storedUser = localStorage.getItem('gvr_user');
+            if (!storedUser) {
                 alert("Вы не вошли в систему!");
                 return;
             }
-            const user = JSON.parse(userData);
+            const user = JSON.parse(storedUser);
 
             try {
                 const { error } = await supabaseClient
@@ -64,21 +59,13 @@
                     .insert([{ 
                         username: user.username, 
                         type: 'car', 
-                        data: { 
-                            brand: brand, 
-                            model: model, 
-                            year: document.getElementById('car-year').value, 
-                            plate: plate, 
-                            photos: document.getElementById('car-photos').value 
-                        },
+                        data: { brand: b, model: m, plate: p },
                         status: 'pending' 
                     }]);
 
                 if (error) throw error;
-
-                alert("✅ Заявка отправлена!");
+                alert("Успешно!");
                 window.location.href = '../index.html';
-
             } catch (err) {
                 alert("Ошибка: " + err.message);
             }
