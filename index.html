@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>КальтУслуги | GVRPA</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <div id="auth-container">
+        <h1>🏛 КАЛЬТУСЛУГИ</h1>
+        
+        <div id="login-form">
+            <h2>Вход</h2>
+            <input type="email" id="email" placeholder="Email">
+            <input type="password" id="password" placeholder="Пароль">
+            <button onclick="signIn()">Войти</button>
+            <p>Нет аккаунта? <a href="#" onclick="toggleAuth()">Зарегистрироваться</a></p>
+        </div>
+
+        <div id="register-form" style="display: none;">
+            <h2>Регистрация</h2>
+            <input type="text" id="reg-nickname" placeholder="Ник в игре (Roblox)">
+            <input type="text" id="reg-tg" placeholder="@ Телеграм">
+            <input type="email" id="reg-email" placeholder="Email">
+            <input type="password" id="reg-password" placeholder="Пароль">
+            <button onclick="signUp()">Создать аккаунт</button>
+            <p>Уже есть аккаунт? <a href="#" onclick="toggleAuth()">Войти</a></p>
+        </div>
+    </div>
+
+    <div id="main-content" style="display: none;">
+        <header>
+            <span>🏛 КальтУслуги</span>
+            <button onclick="signOut()">Выйти</button>
+        </header>
+        
+   <div class="grid">
+    <div class="card" onclick="openForm('car')">
+        <span class="icon">🚗</span>
+        <h3>Регистрация авто</h3>
+    </div>
+    <div class="card" onclick="openForm('id')">
+        <span class="icon">🪪</span>
+        <h3>ID-карта</h3>
+    </div>
+    <div class="card" onclick="openForm('license')">
+        <span class="icon">💳</span>
+        <h3>Вод. права</h3>
+    </div>
+    <div class="card" onclick="openForm('house')">
+        <span class="icon">🏠</span>
+        <h3>Регистрация дома</h3>
+    </div>
+    <div class="card" onclick="openForm('accident')">
+        <span class="icon">💥</span>
+        <h3>Регистрация ДТП</h3>
+    </div>
+    <div class="card" onclick="openForm('court')">
+        <span class="icon">⚖️</span>
+        <h3>Подать в суд</h3>
+    </div>
+    <div class="card" onclick="openForm('marriage')">
+        <span class="icon">💍</span>
+        <h3>ЗАГС</h3>
+    </div>
+    <div class="card" onclick="openForm('realty')">
+        <span class="icon">🏗</span>
+        <h3>Недвижимость</h3>
+    </div>
+    <div class="card" onclick="openForm('rules')">
+        <span class="icon">📜</span>
+        <h3>Правила проекта</h3>
+    </div>
+    <div id="police-tile" class="card police-only" style="display: none;" onclick="location.href='admin.html'">
+        <span class="icon">🚔</span>
+        <h3>База данных</h3>
+    </div>
+</div>
+
+    <script src="script.js"></script>
+</body>
+</html>
