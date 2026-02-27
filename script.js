@@ -60,8 +60,11 @@ function logout() {
 }
 
 function openForm(type) {
-    // Переход в папку forms к нужному файлу
-    window.location.href = forms/${type}.html;
+    if (type === 'police') {
+        window.location.href = 'police.html';
+    } else {
+        window.location.href = forms/${type}.html;
+    }
 }
 
 
