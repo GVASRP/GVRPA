@@ -1,4 +1,48 @@
-<script>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация ТС | КальтУслуги</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000; /* Черный фон на случай, если CSS не прогрузится */
+        }
+        #auth-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="auth-screen">
+        <div class="auth-card">
+            <h1>🚗 РЕГИСТРАЦИЯ ТС</h1>
+            <p class="subtitle">Заполните данные о вашем транспортном средстве</p>
+
+            <div id="login-box">
+                <input type="text" id="car-brand" placeholder="1. Марка Т/С">
+                <input type="text" id="car-model" placeholder="2. Модель">
+                <input type="number" id="car-year" placeholder="3. Год выпуска">
+                <input type="text" id="car-plate" placeholder="4. Регистрационный номер">
+                
+                <p style="text-align: left; font-size: 13px; margin-top: 15px; color: #aaa;">5. Фото авто (ссылки):</p>
+                <textarea id="car-photos" placeholder="https://imgur.com/..." style="width: 100%; background: #000; color: #fff; border: 1px solid #333; border-radius: 5px; padding: 10px; margin-bottom: 10px; font-family: inherit; box-sizing: border-box;"></textarea>
+                
+                <button onclick="sendCarApplication()" class="btn-main">Подать заявку</button>
+                <button onclick="location.href='../index.html'" class="btn-exit" style="width: 100%; margin-top: 10px; background: transparent; color: #666; border: none; cursor: pointer;">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
         const SUPABASE_URL = 'https://exbhxsdwqznmroxrzxjp.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4Ymh4c2R3cXpubXJveHJ6eGpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDUzMzksImV4cCI6MjA4NzY4MTMzOX0.CUpzfJCrhghGNZKMK4xboXA7ZdSbYArWBSW4LpMevVk';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -14,7 +58,6 @@
             const plate = document.getElementById('car-plate').value;
             const photos = document.getElementById('car-photos').value;
 
-            // ИСПРАВЛЕНО: Добавлены || между условиями
             if(!brand  !model  !plate) return alert("Заполните поля!");
 
             const { error } = await supabaseClient
@@ -29,8 +72,10 @@
             if (error) {
                 alert("Ошибка: " + error.message);
             } else {
-                alert("Заявка подана!");
+                alert("Заявка успешно подана!");
                 window.location.href = '../index.html';
             }
         }
     </script>
+</body>
+</html>
